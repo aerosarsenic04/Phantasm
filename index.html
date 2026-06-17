@@ -187,9 +187,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
 
         <!-- window -->
         <g class="clickable" onclick="clickHotspot('window')">
-          <image href="assets/obj_window.png" x="80" y="30" width="160" height="270" preserveAspectRatio="xMidYMid meet"/>
           <g id="window-crack-glow">
-            <image href="assets/fx_window_crack.png" x="80" y="30" width="160" height="270" preserveAspectRatio="xMidYMid meet"/>
             <!-- crack lines -->
             <line x1="148" y1="110" x2="162" y2="195" stroke="#c4874a" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
             <line x1="162" y1="195" x2="155" y2="240" stroke="#c4874a" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
@@ -200,27 +198,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
 
         <!-- the clock -->
         <g class="clickable" onclick="clickHotspot('clock')">
-          <image href="assets/obj_clock.png" x="808" y="248" width="75" height="80" preserveAspectRatio="xMidYMid meet"/>
           <text x="840" y="342" text-anchor="middle" class="hs-label">CLOCK</text>
           <text x="840" y="276" text-anchor="middle" font-family="'Share Tech Mono'" font-size="10" fill="#c4874a" id="clock-face-text">6:00 PM</text>
         </g>
 
         <!-- 30% chance of being killed by the mirror!!!!! -->
         <g class="clickable" onclick="clickHotspot('mirror')">
-          <image href="assets/obj_mirror.png" x="670" y="20" width="130" height="200" preserveAspectRatio="xMidYMid meet"/>
           <rect x="677" y="27" width="116" height="176" fill="#3a2020" opacity="0.07" id="mirror-tint"/>
           <text x="735" y="234" text-anchor="middle" class="hs-label">MIRROR</text>
         </g>
 
         <!-- Journal -->
         <g class="clickable" onclick="clickHotspot('journal')">
-          <image href="assets/obj_journal.png" x="310" y="240" width="70" height="55" preserveAspectRatio="xMidYMid meet"/>
           <text x="349" y="310" text-anchor="middle" class="hs-label">JOURNAL</text>
         </g>
 
         <!-- DOOR to living room -->
         <g class="clickable" onclick="goToLiving()">
-          <image href="assets/obj_door.png" x="882" y="100" width="95" height="225" preserveAspectRatio="xMidYMid meet"/>
           <text x="929" y="340" text-anchor="middle" class="hs-label">LIVING →</text>
         </g>
 
@@ -233,28 +227,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
         <image href="assets/bg_living.png" x="0" y="0" width="1000" height="560" preserveAspectRatio="xMidYMid slice"/>
 
         <g class="clickable" onclick="clickHotspot('sink')">
-          <image href="assets/obj_kitchen.png" x="575" y="160" width="300" height="160" preserveAspectRatio="xMidYMid meet"/>
           <text x="725" y="336" text-anchor="middle" class="hs-label">Kitchen</text>
         </g>
 
         <g class="clickable" onclick="clickHotspot('shelf')">
-          <image href="assets/obj_shelf.png" x="40" y="90" width="130" height="220" preserveAspectRatio="xMidYMid meet"/>
           <text x="105" y="326" text-anchor="middle" class="hs-label">SHELF</text>
         </g>
 
         <!-- polaroid spaen!! -->
         <g id="shelf-polaroid" class="clickable" onclick="clickHotspot('polaroid')" style="display:none">
-          <image href="assets/obj_polaroid.png" x="122" y="224" width="40" height="50" preserveAspectRatio="xMidYMid meet"/>
           <text x="142" y="285" text-anchor="middle" class="hs-label">PHOTO</text>
         </g>
 
         <g class="clickable" onclick="goToBathroom()">
-          <image href="assets/obj_door.png" x="370" y="100" width="90" height="215" preserveAspectRatio="xMidYMid meet"/>
           <text x="415" y="330" text-anchor="middle" class="hs-label">BATH →</text>
         </g>
 
         <g class="clickable" onclick="goToBedroom()">
-          <image href="assets/obj_door.png" x="0" y="100" width="55" height="215" preserveAspectRatio="xMidYMid meet"/>
           <text x="27" y="330" text-anchor="middle" class="hs-label">← BED</text>
         </g>
 
@@ -265,26 +254,22 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
       <g id="room-bathroom" style="display:none">
         <image href="assets/bg_bathroom.png" x="0" y="0" width="1000" height="560" preserveAspectRatio="xMidYMid slice"/>
 
-        <!-- MOLDDDDD -->
-        <image id="mold-ceiling" href="assets/fx_mold_ceiling.png"
+        <image id="mold-ceiling" href=""
                x="200" y="0" width="600" height="200"
                preserveAspectRatio="xMidYMid meet" opacity="0" style="transition:opacity 3s"/>
-        <image id="fungus-vines" href="assets/fx_fungus_vines.png"
+        <image id="fungus-vines" href=""
                x="0" y="0" width="1000" height="560"
                preserveAspectRatio="xMidYMid slice" opacity="0" style="transition:opacity 3s"/>
 
         <g class="clickable" onclick="clickHotspot('undersink')">
-          <image href="assets/obj_cabinet.png" x="70" y="185" width="130" height="145" preserveAspectRatio="xMidYMid meet"/>
-          <text x="135" y="345" text-anchor="middle" class="hs-label">CABINET</text>
+          <text x="232.5" y="562.5" text-anchor="middle" class="hs-label">CABINET</text>
         </g>
 
         <g class="clickable" onclick="clickHotspot('vent')">
-          <image href="assets/obj_vent.png" x="270" y="90" width="90" height="65" preserveAspectRatio="xMidYMid meet"/>
           <text x="315" y="170" text-anchor="middle" class="hs-label">VENT</text>
         </g>
 
         <g class="clickable" onclick="goToLiving()">
-          <image href="assets/obj_door.png" x="0" y="100" width="62" height="225" preserveAspectRatio="xMidYMid meet"/>
           <text x="31" y="340" text-anchor="middle" class="hs-label">← BACK</text>
         </g>
 
@@ -332,17 +317,15 @@ const PORTRAITS = {
   mc:          'assets/portrait_mc.png',
   mold:        'assets/portrait_mold.png',
   mime:        'assets/portrait_mime.png',
-  mirror_self: 'assets/portrait_mirror_self.png',
+  mirror_self: 'assets/portrait_mc.png',
   fungus:      'assets/portrait_fungus.png',
   sibling:     'assets/portrait_sibling.png',
 };
 
 // Creature sprite pahts
 const SPRITES = {
-  mold:    'assets/sprite_mold.png',
-  mime:    'assets/sprite_mime.png',
-  fungus:  'assets/sprite_fungus.png',
-  sibling: 'assets/sprite_sibling.png',
+  mold: 'assets/sprite_silhouette.png',
+  mime: 'assets/sprite_silhouette.png',
 };
 
 // Item sprite s
@@ -1094,7 +1077,6 @@ function spawnCloth() {
   el.setAttribute('class', 'clickable');
   // Template literal builds the inner SVG markup as a string
   el.innerHTML = `
-    <image href="assets/item_cloth.png" x="130" y="240" width="50" height="40" preserveAspectRatio="xMidYMid meet"/>
     <text x="155" y="292" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">CLOTH</text>`;
   el.onclick = () => {
     addItem('Cloth');
@@ -1114,7 +1096,6 @@ function spawnShard() {
   el.setAttribute('class', 'clickable');
   el.id = 'shard-item';
   el.innerHTML = `
-    <image href="assets/item_shard.png" x="675" y="218" width="40" height="35" preserveAspectRatio="xMidYMid meet"/>
     <text x="695" y="264" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#5a4040" letter-spacing="1">SHARD</text>`;
   el.onclick = () => {
     addItem('Mirror Shard');
@@ -1133,7 +1114,6 @@ function spawnMask() {
   el.setAttribute('class', 'clickable');
   el.id = 'mask-item';
   el.innerHTML = `
-    <image href="assets/item_mask.png" x="390" y="258" width="80" height="50" preserveAspectRatio="xMidYMid meet"/>
     <text x="430" y="320" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#5a5040" letter-spacing="1">MASK</text>`;
   el.onclick = () => {
     addItem('Mask');
@@ -1183,7 +1163,6 @@ function spawnCamera() {
   el.setAttribute('class', 'clickable');
   el.id = 'camera-item';
   el.innerHTML = `
-    <image href="assets/item_camera.png" x="460" y="252" width="70" height="50" preserveAspectRatio="xMidYMid meet"/>
     <text x="495" y="315" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">CAMERA</text>`;
   el.onclick = () => {
     addItem('Camera');
@@ -1202,7 +1181,6 @@ function spawnStopwatch() {
   el.setAttribute('class', 'clickable');
   el.id = 'sw-item';
   el.innerHTML = `
-    <image href="assets/item_stopwatch.png" x="336" y="248" width="44" height="44" preserveAspectRatio="xMidYMid meet"/>
     <text x="358" y="304" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">STOPWATCH</text>`;
   el.onclick = () => {
     addItem('Stopwatch');
@@ -1230,7 +1208,7 @@ function spawnMold() {
   el.setAttribute('class', 'creature-sprite');
   el.id = 'mold-creature';
   el.innerHTML = `
-    <image href="assets/sprite_mold.png" x="310" y="80" width="160" height="190" preserveAspectRatio="xMidYMid meet"/>
+    <image href="assets/sprite_silhouette.png" x="310" y="80" width="160" height="190" preserveAspectRatio="xMidYMid meet"/>
     <text x="390" y="282" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#4a6a20" letter-spacing="1">[ speak ]</text>`;
   el.onclick = () => talkMold();
   g.appendChild(el);
@@ -1279,7 +1257,7 @@ function spawnMime() {
   el.setAttribute('class', 'creature-sprite');
   el.id = 'mime-creature';
   el.innerHTML = `
-    <image href="assets/sprite_mime.png" x="685" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
+    <image href="assets/sprite_silhouette.png" x="685" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
     <text x="750" y="442" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#2a4a8a" letter-spacing="1">[ speak ]</text>`;
   el.onclick = () => talkMime();
   g.appendChild(el);
@@ -1331,7 +1309,7 @@ function respawnMime() {
   el.id = 'mime-creature';
   // Slightly different x position on respawn — suggests it moved while gone
   el.innerHTML = `
-    <image href="assets/sprite_mime.png" x="530" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
+    <image href="assets/sprite_silhouette.png" x="530" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
     <text x="595" y="442" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#2a4a8a" letter-spacing="1">[ speak ]</text>`;
   el.onclick = () => talkMime();
   g.appendChild(el);
@@ -1351,7 +1329,6 @@ function spawnFungus() {
   el.setAttribute('class', 'creature-sprite');
   el.id = 'fungus-creature';
   el.innerHTML = `
-    <image href="assets/sprite_fungus.png" x="380" y="60" width="240" height="280" preserveAspectRatio="xMidYMid meet"/>
     <text x="500" y="352" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#8a3a9a" letter-spacing="1">[ speak ]</text>`;
   el.onclick = () => talkFungus();
   g.appendChild(el);
@@ -1413,7 +1390,6 @@ function startPhase2() {
       el.id = 'sibling-creature';
       el.style.opacity = '0.7';
       el.innerHTML = `
-        <image href="assets/sprite_sibling.png" x="190" y="130" width="120" height="250" preserveAspectRatio="xMidYMid meet"/>
         <text x="250" y="390" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#5a5060" letter-spacing="1">[ speak ]</text>`;
       el.onclick = () => talkSibling();
       g.appendChild(el);
