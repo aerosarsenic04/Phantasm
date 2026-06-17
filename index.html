@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thermophilic Night</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Share+Tech+Mono&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+/*  RESET & CSS VARS  easy change*/
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08070a;
+  --amber:#c4874a;
+  --amber-dim:#7a5020;
+  --amber-pale:#f0d49a;
+  --text:#d8cbb0;
+  --text-dim:#7a6a50;
+  --text-faint:#3a3020;
+  --border:#2a2018;
+  --serif:'Crimson Pro',Georgia,serif;
+  --mono:'Share Tech Mono',monospace;
+  --display:'IM Fell English',serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cursor:default}
+
+/* LAYOUT */
+#game-wrap{width:100vw;height:100vh;display:flex;flex-direction:column;position:relative}
+#scene{flex:1;position:relative;overflow:hidden;min-height:0}
+#room-svg{width:100%;height:100%;position:absolute;inset:0}
+
+/*CLOCK N INVENTORY*/
+#hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
+     align-items:flex-start;padding:14px 20px;pointer-events:none;z-index:10}
+#clock-display{font-family:var(--mono);font-size:14px;color:var(--amber-dim);
+               letter-spacing:2px;background:rgba(8,7,10,0.7);padding:4px 10px;
+               border:1px solid #1a1508}
+#inventory-display{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:all}
+.inv-chip{font-family:var(--mono);font-size:10px;padding:3px 8px;border:1px solid var(--amber-dim);
+          color:var(--amber);background:rgba(8,7,10,0.8);letter-spacing:1px;cursor:pointer;
+          transition:all 0.15s}
+.inv-chip:hover{border-color:var(--amber);color:var(--amber-pale)}
+.inv-chip.active{border-color:var(--amber-pale);background:rgba(196,135,74,0.15);color:var(--amber-pale)}
+
+/* VN BOX*/
+#dialogue{position:absolute;bottom:0;left:0;right:0;z-index:30;
+          transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.2,0,0,1)}
+#dialogue.open{transform:translateY(0)}
+#dialogue-inner{background:rgba(8,7,10,0.97);border-top:1px solid var(--border);
+                display:flex;gap:0;min-height:160px;max-height:240px}
+#portrait-area{width:160px;flex-shrink:0;display:flex;flex-direction:column;
+               align-items:center;justify-content:flex-end;padding:0;
+               border-right:1px solid var(--border);position:relative;overflow:hidden}
+#portrait-img{width:160px;height:200px;object-fit:cover;object-position:top;display:block}
+#speaker-name{font-family:var(--display);font-size:13px;letter-spacing:2px;
+              text-transform:uppercase;padding:8px 0 12px;color:var(--amber);
+              text-align:center;width:100%}
+#dialogue-text-area{flex:1;padding:20px 24px 16px;display:flex;flex-direction:column;
+                    justify-content:space-between}
+#dialogue-text{font-family:var(--serif);font-size:17px;line-height:1.75;
+               color:var(--text);font-style:italic}
+#dialogue-continue{font-family:var(--mono);font-size:11px;color:var(--amber-dim);
+                   align-self:flex-end;margin-top:10px;cursor:pointer;letter-spacing:1px;
+                   animation:blink 1.4s ease-in-out infinite}
+#dialogue-continue:hover{color:var(--amber)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* BUTTONS 9choice */
+#choices{position:absolute;bottom:0;left:0;right:0;z-index:31;
+         background:rgba(8,7,10,0.97);border-top:1px solid var(--border);
+         padding:16px 24px;display:none;flex-direction:column;gap:8px}
+#choices.open{display:flex}
+.choice-btn{font-family:var(--serif);font-size:16px;padding:8px 16px;
+            border:1px solid var(--border);color:var(--text-dim);background:transparent;
+            cursor:pointer;text-align:left;transition:all 0.18s;font-style:italic}
+.choice-btn:hover{border-color:var(--amber-dim);color:var(--text);background:rgba(196,135,74,0.06)}
+
+/* intro and overla */
+#radio-screen{position:fixed;inset:0;z-index:101;background:var(--bg);
+              display:flex;align-items:center;justify-content:center}
+#radio-text{font-family:var(--mono);font-size:13px;color:var(--amber-dim);
+            max-width:500px;text-align:center;line-height:2.4;letter-spacing:1px}
+.radio-line{opacity:0;display:block;transition:opacity 0.6s}
+.radio-line.static{color:#3a3020;font-size:11px}
+.radio-line.signal{color:var(--amber);font-size:14px}
+
+#mono-screen{position:fixed;inset:0;z-index:102;background:var(--bg);display:none;
+             align-items:center;justify-content:center;flex-direction:column;
+             gap:30px;padding:60px}
+#mono-text{font-family:var(--display);font-size:22px;line-height:1.9;color:var(--text);
+           max-width:560px;text-align:center;font-style:italic}
+.mono-line{opacity:0;transition:opacity 1s}
+
+#end-screen{position:fixed;inset:0;z-index:100;background:var(--bg);display:none;
+            flex-direction:column;align-items:center;justify-content:center;gap:0}
+.screen-content{max-width:560px;width:100%;padding:40px;display:flex;flex-direction:column;gap:18px}
+.screen-title{font-family:var(--display);font-size:38px;letter-spacing:3px;line-height:1.2}
+.screen-sub{font-family:var(--mono);font-size:11px;color:var(--amber-dim);
+            letter-spacing:3px;text-transform:uppercase}
+.screen-body{font-family:var(--serif);font-size:17px;line-height:1.85;
+             color:var(--text-dim);white-space:pre-wrap}
+.screen-btn{font-family:var(--mono);font-size:12px;padding:10px 24px;
+            border:1px solid var(--amber-dim);color:var(--amber);background:transparent;
+            cursor:pointer;letter-spacing:2px;text-transform:uppercase;margin-top:8px;
+            width:fit-content;transition:all 0.2s}
+.screen-btn:hover{border-color:var(--amber);background:rgba(196,135,74,0.1)}
+
+/* tint overlay*/
+#vignette{position:absolute;inset:0;pointer-events:none;z-index:5;
+          box-shadow:inset 0 0 180px 60px rgba(0,0,0,0.7);transition:box-shadow 2s}
+#vignette.fungus-active{box-shadow:inset 0 0 180px 60px rgba(100,20,120,0.6)}
+#vignette.mirror-active{box-shadow:inset 0 0 180px 60px rgba(140,60,60,0.4)}
+
+/* nav tab*/
+#room-tabs{position:absolute;top:50px;left:0;display:flex;flex-direction:column;
+           gap:2px;z-index:10}
+.room-tab{font-family:var(--mono);font-size:10px;padding:5px 10px 5px 14px;
+          border:1px solid #1a1508;border-left:none;color:var(--text-faint);
+          background:rgba(8,7,10,0.8);cursor:pointer;letter-spacing:1px;transition:all 0.2s}
+.room-tab:hover,.room-tab.active{color:var(--amber-dim);border-color:var(--border)}
+
+/* click styles */
+.clickable{cursor:pointer;transition:opacity 0.2s}
+.clickable:hover{opacity:0.75}
+.creature-sprite{cursor:pointer;transition:opacity 0.5s}
+.creature-sprite:hover{opacity:0.8}
+.hs-label{font-family:'Share Tech Mono',monospace;font-size:9px;fill:#3a3020;
+          letter-spacing:1px;pointer-events:none}
+
+/* flicker for window crack */
+@keyframes crack-flicker{0%,100%{opacity:0.55}40%{opacity:0.9}60%{opacity:0.35}80%{opacity:0.75}}
+#window-crack-glow{animation:crack-flicker 3.2s ease-in-out infinite;pointer-events:none}
+</style>
+</head>
+<body>
+
+<!--  Radio lines -->
+<div id="radio-screen">
+  <div id="radio-text">
+    <span class="radio-line static" id="r0">— — — ◈ — — —</span>
+    <span class="radio-line static" id="r1">...static...</span>
+    <span class="radio-line signal" id="r2">eastern district evacuation order remains in effect</span>
+    <span class="radio-line static" id="r3">...static...</span>
+    <span class="radio-line signal" id="r4">fungal count: critical. do not open doors or windows.</span>
+    <span class="radio-line static" id="r5">...if you are hearing this...</span>
+    <span class="radio-line signal" id="r6">evacuation vehicles will make one final pass at dawn.</span>
+    <span class="radio-line static" id="r7">...more static...</span>
+    <span class="radio-line static" id="r8">— — — ◈ — — —</span>
+  </div>
+</div>
+
+<!-- monologue -->
+<div id="mono-screen">
+  <div id="mono-text">
+    <span class="mono-line" id="m0">I don't know how long I've been in the bedroom.</span><br><br>
+    <span class="mono-line" id="m1">My journal has dates… but I can’t remember if I’ve been keeping track. The gaps are too big…</span><br><br>
+    <span class="mono-line" id="m2">I’m starting to see things again…<br>I know they aren't real.</span><br><br>
+    <span class="mono-line" id="m3">There's a crack in the window. I can hear it… a thin hiss,<br>hot air bleeding through. I should seal it before anything gets in.</span><br><br>
+    <span class="mono-line" id="m4">The alarm clock just bled a radio signal through the static.<br>Something is happening outside again.</span><br><br>
+    <span class="mono-line" id="m5">I need to move.</span>
+  </div>
+  <button class="screen-btn" id="mono-skip" style="display:none" onclick="startGame()">— begin —</button>
+</div>
+
+<!-- END AHAHHAHA -->
+<div id="end-screen">
+  <div class="screen-content">
+    <div class="screen-sub" id="end-sub">ending</div>
+    <div class="screen-title" id="end-title">—</div>
+    <div class="screen-body" id="end-text"></div>
+    <button class="screen-btn" onclick="location.reload()">play again</button>
+  </div>
+</div>
+
+<!-- wrapper -->
+<div id="game-wrap" style="display:none">
+  <div id="scene">
+    <div id="vignette"></div>
+
+    <!-- THE ROOMS )svg) -->
+    <svg id="room-svg" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid slice"
+         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+      <!-- bedroom -->
+      <g id="room-bedroom">
+        <image href="assets/bg_bedroom.png" x="0" y="0" width="1000" height="560" preserveAspectRatio="xMidYMid slice"/>
+
+        <!-- window -->
+        <g class="clickable" onclick="clickHotspot('window')">
+          <image href="assets/obj_window.png" x="80" y="30" width="160" height="270" preserveAspectRatio="xMidYMid meet"/>
+          <g id="window-crack-glow">
+            <image href="assets/fx_window_crack.png" x="80" y="30" width="160" height="270" preserveAspectRatio="xMidYMid meet"/>
+            <!-- crack lines -->
+            <line x1="148" y1="110" x2="162" y2="195" stroke="#c4874a" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+            <line x1="162" y1="195" x2="155" y2="240" stroke="#c4874a" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <ellipse cx="155" cy="175" rx="18" ry="60" fill="#c4874a" opacity="0.08"/>
+          </g>
+          <text x="160" y="315" text-anchor="middle" class="hs-label">WINDOW</text>
+        </g>
+
+        <!-- the clock -->
+        <g class="clickable" onclick="clickHotspot('clock')">
+          <image href="assets/obj_clock.png" x="808" y="248" width="75" height="80" preserveAspectRatio="xMidYMid meet"/>
+          <text x="840" y="342" text-anchor="middle" class="hs-label">CLOCK</text>
+          <text x="840" y="276" text-anchor="middle" font-family="'Share Tech Mono'" font-size="10" fill="#c4874a" id="clock-face-text">6:00 PM</text>
+        </g>
+
+        <!-- 30% chance of being killed by the mirror!!!!! -->
+        <g class="clickable" onclick="clickHotspot('mirror')">
+          <image href="assets/obj_mirror.png" x="670" y="20" width="130" height="200" preserveAspectRatio="xMidYMid meet"/>
+          <rect x="677" y="27" width="116" height="176" fill="#3a2020" opacity="0.07" id="mirror-tint"/>
+          <text x="735" y="234" text-anchor="middle" class="hs-label">MIRROR</text>
+        </g>
+
+        <!-- Journal -->
+        <g class="clickable" onclick="clickHotspot('journal')">
+          <image href="assets/obj_journal.png" x="310" y="240" width="70" height="55" preserveAspectRatio="xMidYMid meet"/>
+          <text x="349" y="310" text-anchor="middle" class="hs-label">JOURNAL</text>
+        </g>
+
+        <!-- DOOR to living room -->
+        <g class="clickable" onclick="goToLiving()">
+          <image href="assets/obj_door.png" x="882" y="100" width="95" height="225" preserveAspectRatio="xMidYMid meet"/>
+          <text x="929" y="340" text-anchor="middle" class="hs-label">LIVING →</text>
+        </g>
+
+        <!-- items and creatures -->
+        <g id="bedroom-creatures"></g>
+      </g>
+
+      <!-- living room -->
+      <g id="room-living" style="display:none">
+        <image href="assets/bg_living.png" x="0" y="0" width="1000" height="560" preserveAspectRatio="xMidYMid slice"/>
+
+        <g class="clickable" onclick="clickHotspot('sink')">
+          <image href="assets/obj_kitchen.png" x="575" y="160" width="300" height="160" preserveAspectRatio="xMidYMid meet"/>
+          <text x="725" y="336" text-anchor="middle" class="hs-label">Kitchen</text>
+        </g>
+
+        <g class="clickable" onclick="clickHotspot('shelf')">
+          <image href="assets/obj_shelf.png" x="40" y="90" width="130" height="220" preserveAspectRatio="xMidYMid meet"/>
+          <text x="105" y="326" text-anchor="middle" class="hs-label">SHELF</text>
+        </g>
+
+        <!-- polaroid spaen!! -->
+        <g id="shelf-polaroid" class="clickable" onclick="clickHotspot('polaroid')" style="display:none">
+          <image href="assets/obj_polaroid.png" x="122" y="224" width="40" height="50" preserveAspectRatio="xMidYMid meet"/>
+          <text x="142" y="285" text-anchor="middle" class="hs-label">PHOTO</text>
+        </g>
+
+        <g class="clickable" onclick="goToBathroom()">
+          <image href="assets/obj_door.png" x="370" y="100" width="90" height="215" preserveAspectRatio="xMidYMid meet"/>
+          <text x="415" y="330" text-anchor="middle" class="hs-label">BATH →</text>
+        </g>
+
+        <g class="clickable" onclick="goToBedroom()">
+          <image href="assets/obj_door.png" x="0" y="100" width="55" height="215" preserveAspectRatio="xMidYMid meet"/>
+          <text x="27" y="330" text-anchor="middle" class="hs-label">← BED</text>
+        </g>
+
+        <g id="living-creatures"></g>
+      </g>
+
+      <!-- bathroom -->
+      <g id="room-bathroom" style="display:none">
+        <image href="assets/bg_bathroom.png" x="0" y="0" width="1000" height="560" preserveAspectRatio="xMidYMid slice"/>
+
+        <!-- MOLDDDDD -->
+        <image id="mold-ceiling" href="assets/fx_mold_ceiling.png"
+               x="200" y="0" width="600" height="200"
+               preserveAspectRatio="xMidYMid meet" opacity="0" style="transition:opacity 3s"/>
+        <image id="fungus-vines" href="assets/fx_fungus_vines.png"
+               x="0" y="0" width="1000" height="560"
+               preserveAspectRatio="xMidYMid slice" opacity="0" style="transition:opacity 3s"/>
+
+        <g class="clickable" onclick="clickHotspot('undersink')">
+          <image href="assets/obj_cabinet.png" x="70" y="185" width="130" height="145" preserveAspectRatio="xMidYMid meet"/>
+          <text x="135" y="345" text-anchor="middle" class="hs-label">CABINET</text>
+        </g>
+
+        <g class="clickable" onclick="clickHotspot('vent')">
+          <image href="assets/obj_vent.png" x="270" y="90" width="90" height="65" preserveAspectRatio="xMidYMid meet"/>
+          <text x="315" y="170" text-anchor="middle" class="hs-label">VENT</text>
+        </g>
+
+        <g class="clickable" onclick="goToLiving()">
+          <image href="assets/obj_door.png" x="0" y="100" width="62" height="225" preserveAspectRatio="xMidYMid meet"/>
+          <text x="31" y="340" text-anchor="middle" class="hs-label">← BACK</text>
+        </g>
+
+        <g id="bathroom-creatures"></g>
+      </g>
+
+    </svg><!-- end #room-svg -->
+
+    <!-- overlay !!! heads up display over the svg -->
+    <div id="hud">
+      <div id="clock-display">6:00 PM</div>
+      <div id="inventory-display"></div>
+    </div>
+    <div id="room-tabs">
+      <div class="room-tab active" onclick="goToBedroom()">bedroom</div>
+      <div class="room-tab" onclick="goToLiving()">living</div>
+      <div class="room-tab" onclick="goToBathroom()">bathroom</div>
+    </div>
+  </div><!-- end #scene -->
+
+  <!-- dialogue box opening -->
+  <div id="dialogue">
+    <div id="dialogue-inner">
+      <div id="portrait-area">
+        <img id="portrait-img" src="assets/portrait_mc.png" alt=""/>
+        <div id="speaker-name">—</div>
+      </div>
+      <div id="dialogue-text-area">
+        <div id="dialogue-text"></div>
+        <div id="dialogue-continue" onclick="advanceDialogue()">[ click to continue ]</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- choice btns-->
+  <div id="choices"></div>
+
+</div><!-- end #game-wrap -->
+
+<script>
+// Arrays and objects used as simple named maps: portrait path, sprite
+// path, etc. 
+// image paths: key character id string oheoheoh
+const PORTRAITS = {
+  mc:          'assets/portrait_mc.png',
+  mold:        'assets/portrait_mold.png',
+  mime:        'assets/portrait_mime.png',
+  mirror_self: 'assets/portrait_mirror_self.png',
+  fungus:      'assets/portrait_fungus.png',
+  sibling:     'assets/portrait_sibling.png',
+};
+
+// Creature sprite pahts
+const SPRITES = {
+  mold:    'assets/sprite_mold.png',
+  mime:    'assets/sprite_mime.png',
+  fungus:  'assets/sprite_fungus.png',
+  sibling: 'assets/sprite_sibling.png',
+};
+
+// Item sprite s
+const ITEM_SPRITES = {
+  shard:     'assets/item_shard.png',
+  mask:      'assets/item_mask.png',
+  cloth:     'assets/item_cloth.png',
+  camera:    'assets/item_camera.png',
+  stopwatch: 'assets/item_stopwatch.png',
+};
+
+// Tot. game duration, ms(10 minutes = 6 AM)
+const TOTAL_MS = 10 * 60 * 1000;
+
+// Each entry [earliestFraction, latestFraction] of TOTAL_MS.
+// HELLO!! NOTE: mask_avail window starts before mold_appears so the player
+// always has a chance to find the mask before the mold becomes kills ya
+const EVENT_WINDOWS = {
+  cloth_avail:     [0.06, 0.10],
+  mirror_shard:    [0.09, 0.14],
+  mask_avail:      [0.10, 0.16],  // mask spawns alongside or before mold
+// made it like this because i got tired of waiting during my play tests
+  mold_appears:    [0.16, 0.22],  // mold appears after mask is available
+  bleach_avail:    [0.24, 0.32],
+  polaroid_avail:  [0.26, 0.34],
+  phase2:          [0.40, 0.40],
+  mime_appears:    [0.48, 0.57],
+  camera_avail:    [0.55, 0.63],
+  stopwatch_avail: [0.59, 0.66],
+  fungus_appears:  [0.76, 0.85],
+  final_choice:    [0.95, 0.95],
+};
+
+// Maps event id strings to the functions that handle em
+// The game loop checks this each frame 
+const EVENT_HANDLERS = {
+  cloth_avail:     () => spawnCloth(),
+  mirror_shard:    () => spawnShard(),
+  mask_avail:      () => spawnMask(),
+  mold_appears:    () => spawnMold(),
+  bleach_avail:    () => spawnBleach(),
+  polaroid_avail:  () => spawnPolaroid(),
+  phase2:          () => startPhase2(),
+  mime_appears:    () => spawnMime(),
+  camera_avail:    () => spawnCamera(),
+  stopwatch_avail: () => spawnStopwatch(),
+  fungus_appears:  () => spawnFungus(),
+  final_choice:    () => finalChoice(),
+};
+
+
+// MUTABLE GAME STATE
+// All runtime state lives in one object (S) and one Set (firedEvents).
+// S.flags is a free-form object used as a boolean/value store for one off
+// conditions (mold been killed, mirror active, etc.).
+
+const S = {
+  running:    false,  // game stops when intro or end
+  startTime:  0,      // Date.now() at the moment startGame() called
+  elapsed:    0,      // ms since game start, frame count
+  phase:      1,      // 1 = early game, 2 = late game (40% game elapsed)
+  dead:       false,
+  won:        false,
+  room:       'bedroom',
+  inventory:  [],     // array of item-name strings the player currently holds
+  flags:      {},     // boolean/value flags set throughout the game
+  activeItem: null,   // string name of the currently selected inventory item, or null
+  coughTimer: null,   // reference to the coughing interval (so we can clear it ohoho)
+};
+
+// Tracks which events have already fired this run ( prevents duplicate runs)
+// A Set is used because checking membership (has) and adding (add) are O(1).
+const firedEvents = new Set();
+
+// Resolved event trigger times (fraction of TOTAL_MS).
+// Built once at startup by randomising within each window in EVENT_WINDOWS.
+const EVENT_TARGETS = {};
+Object.entries(EVENT_WINDOWS).forEach(([id, [lo, hi]]) => {
+  // Math.random() returns [0,1), so lo + rand*(hi-lo) lands in [lo, hi)
+  EVENT_TARGETS[id] = lo + Math.random() * (hi - lo);
+});
+
+// Dialogue queue state  (shared across all dialogue calls)
+let dialogueQueue = [];   // array of {speaker, portrait, text} objects
+let dialogueIndex = 0;    // index of the currently displayed line
+let dialogueCallback = null; // optional function called when the queue ends
+let typingTimer = null;   // interval handle for the typewriter character effect
+
+// Polaroid hold-to-trigger: tracks when the player selected the Polaroid chip.
+// If they keep it selected for 3+ seconds, the mime appears ehe
+let polaroidHeldSince = null; // Date.now() timestamp, or null if not held
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 3 — INTRO SEQUENCE
+// radioIntro → monoIntro → startGame (called by button click)
+// Each sequence uses setTimeout chains to stagger line reveals.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+window.onload = () => radioIntro();
+
+function radioIntro() {
+  // querySelectorAll returns a NodeList (array-like). We iterate it with forEach.
+  // Each line fades in after an accumulated delay (d), longer for signal lines.
+  const lines = document.querySelectorAll('.radio-line');
+  let d = 700;
+  lines.forEach(l => {
+    setTimeout(() => l.style.opacity = '1', d);
+    d += l.classList.contains('signal') ? 950 : 420;
+  });
+
+  // After all lines have faded in, fade the whole screen out, then show monologue
+  setTimeout(() => {
+    const rs = document.getElementById('radio-screen');
+    rs.style.transition = 'opacity 1.2s';
+    rs.style.opacity = '0';
+    setTimeout(() => { rs.style.display = 'none'; monoIntro(); }, 1200);
+  }, d + 900);
+}
+
+function monoIntro() {
+  const ms = document.getElementById('mono-screen');
+  ms.style.display = 'flex';
+
+  // Stagger each .mono-line span's opacity — same accumulating-delay pattern
+  const lines = document.querySelectorAll('.mono-line');
+  let d = 600;
+  lines.forEach(l => { setTimeout(() => l.style.opacity = '1', d); d += 2400; });
+
+  // Show the "begin" button only after every line has appeared
+  setTimeout(() => document.getElementById('mono-skip').style.display = 'block', d + 200);
+}
+
+function startGame() {
+  document.getElementById('mono-screen').style.display = 'none';
+  document.getElementById('game-wrap').style.display = 'flex';
+  S.running = true;
+  S.startTime = Date.now();
+  requestAnimationFrame(gameLoop);
+
+  // Opening dialogue — draws immediate attention to the window crack in-room
+  setTimeout(() => showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "There's a sound. A thin, high hiss from somewhere in the room." },
+    { speaker: 'You', portrait: 'mc', text: "The window. There's a crack in the frame — light bleeding through it. Hot air. I can smell something on it." },
+    { speaker: 'You', portrait: 'mc', text: "I need to deal with that." },
+  ]), 800);
+}
+
+
+// SECTION 4
+// Called every animation frame via requestAnimationFrame while S.running is true.
+// Resp: update elapsed time, update clock displays, fire timed events,
+// check the polaroid hold-timer for the mime trigger
+
+function gameLoop() {
+  if (!S.running) return;
+
+  S.elapsed = Date.now() - S.startTime;
+
+  // f is a 0→1 progress fraction through the full game duration
+  const f = Math.min(S.elapsed / TOTAL_MS, 1);
+
+  // UPD HUD clock
+  const timeString = fractionToTimeString(f);
+  document.getElementById('clock-display').textContent = timeString;
+  const clockFace = document.getElementById('clock-face-text');
+  if (clockFace) clockFace.textContent = timeString;
+
+  // Check event target once when progress time passes
+  // Object.entries returns an array of [key, value] pairs; we loop over them.
+  Object.entries(EVENT_TARGETS).forEach(([id, threshold]) => {
+    if (!firedEvents.has(id) && f >= threshold) {
+      firedEvents.add(id);
+      EVENT_HANDLERS[id]?.(); // optional chaining: safe if handler is undefined
+    }
+  });
+
+  // ── Polaroid hold-to-trigger check ────────────────────────────────────────
+  // If the player has selected the Polaroid chip in their inventory for 3+
+  // real seconds, and the mime hasn't spawned yet, spawn it now.
+  if (S.activeItem === 'Polaroid' && has('Polaroid') && !S.flags.mimeSpawned) {
+    if (polaroidHeldSince === null) {
+      polaroidHeldSince = Date.now(); // start the hold timer
+    } else if (Date.now() - polaroidHeldSince >= 3000) {
+      polaroidHeldSince = null;
+      spawnMime(); // 3 seconds elapsed — trigger the mime
+    }
+  } else {
+    // Player deselected or doesn't have the Polaroid — reset the hold timer
+    if (S.activeItem !== 'Polaroid') polaroidHeldSince = null;
+  }
+
+  if (f < 1) requestAnimationFrame(gameLoop);
+}
+
+// ─── CLOCK DISPLAY HELPER ─────────────────────────────────────────────────────
+// Converts a 0→1 game-progress fraction into a human-readable 12-hour time string.
+// The game runs from 6 PM to 4 AM (10 hours), mapped linearly onto the fraction.
+// Array lookup: hrs is the sequence of hours; we interpolate between entries.
+function fractionToTimeString(f) {
+  const hrs = [18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4]; // 6 PM → 4 AM
+  const idx = f * (hrs.length - 1);
+  const lo = Math.floor(idx);
+  const t = idx - lo; // fractional part, 0→1 between two hours
+  const h = hrs[lo];
+  const m = Math.round(t * 60); // interpolate minutes within the hour
+  const hh = h === 0 ? 12 : (h > 12 ? h - 12 : h); // convert 24h → 12h
+  return `${hh}:${m.toString().padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
+  // padStart(2,'0') zero-pads single-digit minutes: 9 → '09'
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 5 — DIALOGUE SYSTEM
+// A simple queue-based typewriter dialogue. showDialogue() loads a fresh queue;
+// advanceDialogue() moves to the next line or closes the box when done.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function showDialogue(lines, callback) {
+  closeChoices();
+  dialogueQueue = lines;
+  dialogueIndex = 0;
+  dialogueCallback = callback || null;
+  renderCurrentLine();
+  document.getElementById('dialogue').classList.add('open');
+}
+
+function renderCurrentLine() {
+  if (dialogueIndex >= dialogueQueue.length) {
+    // Queue exhausted — close and fire the optional callback
+    closeDialogue();
+    if (dialogueCallback) { const cb = dialogueCallback; dialogueCallback = null; cb(); }
+    return;
+  }
+
+  const line = dialogueQueue[dialogueIndex];
+  document.getElementById('speaker-name').textContent = line.speaker || '—';
+  document.getElementById('portrait-img').src = PORTRAITS[line.portrait] || 'assets/portrait_mc.png';
+
+  // Typewriter effect — clears any running interval, then appends one character
+  // every 22ms until the full text is displayed.
+  clearInterval(typingTimer);
+  const el = document.getElementById('dialogue-text');
+  el.textContent = '';
+  let i = 0;
+  typingTimer = setInterval(() => {
+    if (i < line.text.length) {
+      el.textContent += line.text[i++]; // string concatenation one char at a time
+    } else {
+      clearInterval(typingTimer);
+    }
+  }, 22);
+}
+
+function advanceDialogue() {
+  const el = document.getElementById('dialogue-text');
+  // If typewriter is still running, skip to end of current line instead of advancing
+  if (dialogueIndex < dialogueQueue.length &&
+      el.textContent.length < dialogueQueue[dialogueIndex].text.length) {
+    clearInterval(typingTimer);
+    el.textContent = dialogueQueue[dialogueIndex].text;
+    return;
+  }
+
+  dialogueIndex++;
+  if (dialogueIndex >= dialogueQueue.length) {
+    closeDialogue();
+    if (dialogueCallback) { const cb = dialogueCallback; dialogueCallback = null; cb(); }
+  } else {
+    renderCurrentLine();
+  }
+}
+
+function closeDialogue() {
+  document.getElementById('dialogue').classList.remove('open');
+}
+
+// ─── CHOICE BUTTONS ────────────────────────────────────────────────────────────
+// opts is an array of {label, fn} objects.
+// We build button elements in a loop and append them to #choices.
+function showChoices(opts) {
+  closeDialogue();
+  const container = document.getElementById('choices');
+  container.innerHTML = ''; // clear any previous choices
+  container.classList.add('open');
+
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt.label;
+    btn.onclick = () => { closeChoices(); opt.fn(); };
+    container.appendChild(btn);
+  });
+}
+
+function closeChoices() {
+  const c = document.getElementById('choices');
+  c.classList.remove('open');
+  c.innerHTML = '';
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 6 — ROOM NAVIGATION
+// Only one room <g> is visible at a time. setRoom hides all then shows the target.
+// Also keeps the sidebar tabs in sync.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function setRoom(id) {
+  // Loop over all room ids — array of strings used as both SVG group ids
+  // and as the basis for tab matching
+  ['bedroom', 'living', 'bathroom'].forEach(r => {
+    document.getElementById('room-' + r).style.display = (r === id ? 'block' : 'none');
+  });
+
+  // querySelectorAll returns a NodeList; forEach iterates it with index i
+  document.querySelectorAll('.room-tab').forEach((tab, i) => {
+    tab.classList.toggle('active', ['bedroom', 'living', 'bathroom'][i] === id);
+  });
+
+  S.room = id;
+}
+
+function goToBedroom()  { setRoom('bedroom');  }
+function goToLiving()   { setRoom('living');   }
+function goToBathroom() { setRoom('bathroom'); }
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 7 — INVENTORY
+// S.inventory is a plain array of item-name strings.
+// renderInv rebuilds the HUD chip buttons from scratch each call.
+// Clicking a chip toggles S.activeItem; a second click deselects it.
+// Selecting the Polaroid chip starts the hold-timer in the game loop (Section 4).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function addItem(item) {
+  if (!S.inventory.includes(item)) S.inventory.push(item);
+  renderInv();
+}
+
+function removeItem(item) {
+  // Array.filter returns a new array excluding the target item
+  S.inventory = S.inventory.filter(i => i !== item);
+  if (S.activeItem === item) S.activeItem = null;
+  renderInv();
+}
+
+function has(item) {
+  return S.inventory.includes(item);
+}
+
+function renderInv() {
+  const display = document.getElementById('inventory-display');
+  display.innerHTML = ''; // wipe and rebuild
+
+  S.inventory.forEach(item => {
+    const chip = document.createElement('div');
+    chip.className = 'inv-chip' + (S.activeItem === item ? ' active' : '');
+    chip.textContent = item;
+    chip.onclick = () => {
+      // Toggle: selecting an already-active item deselects it
+      S.activeItem = (S.activeItem === item ? null : item);
+      // Reset the polaroid hold timer whenever selection changes
+      polaroidHeldSince = null;
+      renderInv();
+    };
+    display.appendChild(chip);
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 8 — HOTSPOT DISPATCHER
+// clickHotspot is called by every clickable SVG element.
+// If an item is active, we route to useItemOn instead of the default interaction.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function clickHotspot(id) {
+  if (S.activeItem) return useItemOn(S.activeItem, id);
+
+  // Dispatch table: maps hotspot id strings to their handler functions
+  const handlers = {
+    window:    interactWindow,
+    clock:     interactClock,
+    mirror:    interactMirror,
+    journal:   interactJournal,
+    sink:      interactSink,
+    shelf:     interactShelf,
+    undersink: interactUnderSink,
+    vent:      interactVent,
+    polaroid:  interactPolaroid,
+  };
+
+  handlers[id]?.();
+}
+
+// ─── ITEM-ON-TARGET USE ────────────────────────────────────────────────────────
+// Routes item+target combinations to the correct use function.
+// After routing, the active item is always cleared.
+function useItemOn(item, target) {
+  S.activeItem = null;
+  renderInv();
+
+  // Bleach on vent kills fungus (if alive)
+  if (item === 'Bleach' && target === 'vent' && S.flags.fungusAlive) {
+    useBleachVent(); return;
+  }
+
+  // Bleach on mold or cabinet kills the mold creature (if alive)
+  if (item === 'Bleach' && (target === 'mold' || target === 'undersink') && S.flags.moldAlive) {
+    useBleachMold(); return;
+  }
+
+  // Bleach used while the mime is present — mime leaves for 1 real minute
+  // (player smells it, mime retreats)
+  if (item === 'Bleach' && S.flags.mimeActive) {
+    useBleachOnMime(); return;
+  }
+
+  // Mirror shard used on the mirror — breaks the player out of the mirror
+  if (item === 'Mirror Shard' && target === 'mirror') {
+    breakMirror(); return;
+  }
+
+  // Camera used on the mime — flashes and disperses it temporarily
+  if (item === 'Camera' && target === 'mime') {
+    useCameraOnMime(); return;
+  }
+
+  // Stopwatch used anywhere — quiets all visions for 2 hours
+  if (item === 'Stopwatch') {
+    useStopwatch(); return;
+  }
+
+  // Cloth on the window — seals the crack
+  if (item === 'Cloth' && target === 'window') {
+    sealWindow(); return;
+  }
+
+  showDialogue([{ speaker: 'You', portrait: 'mc', text: "I'm not sure how to use that here." }]);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 9 — HOTSPOT INTERACTIONS (default, no active item)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function interactWindow() {
+  if (S.flags.windowSealed) {
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "The window is sealed. I can hear sand grinding against the glass." }]);
+    return;
+  }
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "There's a crack in the frame. Hot air is seeping through — I can smell it." },
+    { speaker: 'You', portrait: 'mc', text: "If I had something to seal it with... cloth would work." },
+  ], () => {
+    if (has('Cloth')) showChoices([
+      { label: 'Use cloth to seal the crack', fn: sealWindow },
+      { label: 'Leave it for now',            fn: () => {}   },
+    ]);
+  });
+}
+
+function sealWindow() {
+  removeItem('Cloth');
+  S.flags.windowSealed = true;
+  const cg = document.getElementById('window-crack-glow');
+  if (cg) cg.style.display = 'none';
+  showDialogue([{ speaker: 'You', portrait: 'mc', text: "I press the cloth into the crack. The hissing stops. It'll hold." }]);
+}
+
+function interactClock() {
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "The alarm clock. I've stared at it for so many nights I stopped seeing it." },
+    { speaker: 'You', portrait: 'mc', text: "The radio signal came through it earlier. Like the outside world finally found the right frequency." },
+  ]);
+}
+
+function interactMirror() {
+  if (S.flags.mirrorBroken) {
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "The mirror is broken. I can only see myself in pieces now. That's easier." }]);
+    return;
+  }
+
+  if (S.flags.stuckInMirror) {
+    if (has('Mirror Shard')) {
+      showDialogue([
+        { speaker: 'Mirror Self', portrait: 'mirror_self', text: "You know how to come back." },
+        { speaker: 'Mirror Self', portrait: 'mirror_self', text: "Break the surface." },
+      ], breakMirror);
+    } else {
+      showDialogue([
+        { speaker: 'Mirror Self', portrait: 'mirror_self', text: "You don't have the shard. You'll fade soon." },
+        { speaker: 'You', portrait: 'mc', text: "I can feel myself becoming part of the glass." },
+      ], () => setTimeout(() => die('Lost in the Mirror',
+        'Your reflection kept your place. You remained inside — cold, reversed, still. Something wearing your face walked quietly through the house.',
+        'bad'), 6000));
+    }
+    return;
+  }
+
+  // 30% chance to pull the player into the mirror when mirrorActive is set
+  if (S.flags.mirrorActive && Math.random() < 0.30) {
+    S.flags.stuckInMirror = true;
+    document.getElementById('vignette').classList.add('mirror-active');
+    showDialogue([
+      { speaker: 'You', portrait: 'mc', text: "I look at the mirror and something looks back that isn't me." },
+      { speaker: 'Mirror Self', portrait: 'mirror_self', text: "You've been alone so long. It's quiet in here." },
+      { speaker: 'You', portrait: 'mc', text: "And then I'm through. The room is reversed. I'm inside." },
+    ]);
+    return;
+  }
+
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "I've never liked this mirror." },
+    { speaker: 'You', portrait: 'mc', text: "Sometimes my reflection blinks a half second too late." },
+  ]);
+}
+
+function breakMirror() {
+  if (!has('Mirror Shard')) return;
+  removeItem('Mirror Shard');
+  S.flags.stuckInMirror = false;
+  S.flags.mirrorBroken  = true;
+  S.flags.mirrorActive  = false;
+  document.getElementById('vignette').classList.remove('mirror-active');
+  const tint = document.getElementById('mirror-tint');
+  if (tint) { tint.style.opacity = '0.5'; setTimeout(() => tint.style.opacity = '0', 1000); }
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "I drive the shard into the glass. Cold air rushes past and then I'm back in the bedroom, shaking." },
+    { speaker: 'You', portrait: 'mc', text: "The mirror is just broken glass now." },
+  ]);
+}
+
+function interactJournal() {
+  if (!S.flags.journalPage) S.flags.journalPage = 0;
+
+  // Journal pages — an array of strings, indexed by S.flags.journalPage.
+  // Math.min clamps the index so the last page repeats rather than going out of bounds.
+  const pages = [
+    "I stopped going outside in March. Maybe April. I told myself it was the virus. But the virus came later.",
+    "I wrote everything down because I kept forgetting. Who I talked to. What I ate. What day it was.",
+    "There's a photograph I can't look at for more than a few seconds. I put it in the living room so I wouldn't carry it.",
+    "My sibling called three times before I stopped picking up. I told myself they'd understand.",
+    "I keep seeing people in the house. I know they're not real. Knowing doesn't make them leave.",
+    "The last entry has no date. It just says: you have to go outside eventually.",
+  ];
+
+  showDialogue([{ speaker: 'Journal', portrait: 'mc', text: pages[Math.min(S.flags.journalPage, pages.length - 1)] }]);
+  S.flags.journalPage++;
+}
+
+function interactSink() {
+  showDialogue([{ speaker: 'You', portrait: 'mc', text: "The kitchen. Dishes from a few days ago. Nothing useful right now." }]);
+}
+
+function interactShelf() {
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "Books I haven't opened in months." },
+    { speaker: 'You', portrait: 'mc', text: "There's a Polaroid on the lower shelf. I recognize the person in it." },
+  ]);
+}
+
+function interactUnderSink() {
+  if (S.flags.bleachTaken) {
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "Already emptied." }]);
+    return;
+  }
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "Under the sink. A bottle of bleach — nearly full. The label says ventilate before use." },
+  ], () => showChoices([
+    { label: 'Take the bleach', fn: () => {
+      S.flags.bleachTaken = true;
+      addItem('Bleach');
+      showDialogue([{ speaker: 'You', portrait: 'mc', text: "I take it." }]);
+    }},
+    { label: 'Leave it', fn: () => {} },
+  ]));
+}
+
+function interactVent() {
+  if (!S.flags.fungusAlive) {
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "A vent grate. The air is stale but clean." }]);
+    return;
+  }
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "Purple filaments are pushing through the vent slats. I need the bleach." },
+    { speaker: 'You', portrait: 'mc', text: "And I have to remember to open a window after — the fumes are nearly as bad." },
+  ]);
+}
+
+function interactPolaroid() {
+  if (!has('Polaroid')) {
+    showDialogue([
+      { speaker: 'You', portrait: 'mc', text: "A Polaroid photo. Someone I lost." },
+      { speaker: 'You', portrait: 'mc', text: "I shouldn't look at it too long." },
+    ], () => showChoices([
+      { label: 'Take the photograph', fn: () => {
+        addItem('Polaroid');
+        const p = document.getElementById('shelf-polaroid');
+        if (p) p.style.display = 'none';
+        showDialogue([{ speaker: 'You', portrait: 'mc', text: "I take it. I shouldn't, but I do." }]);
+      }},
+      { label: 'Leave it', fn: () => {} },
+    ]));
+    return;
+  }
+
+  // Player already has the Polaroid and clicks on the shelf location —
+  // show the grief reaction. If the mime is present, this also resolves it.
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "I look at the photo. Five seconds. Six." },
+    { speaker: 'You', portrait: 'mc', text: "The grief is sudden and complete. The room tilts." },
+  ], () => {
+    if (S.flags.mimeActive) {
+      showDialogue([
+        { speaker: 'The Mime', portrait: 'mime', text: "..." },
+        { speaker: 'The Mime', portrait: 'mime', text: "..." },
+        { speaker: 'You', portrait: 'mc', text: "It appears behind the photograph. The grief and the figure blur together into something I can't pull away from." },
+        { speaker: 'You', portrait: 'mc', text: "The vision holds for a long time. Then releases." },
+      ], () => {
+        S.flags.mimeActive = false;
+        removeMime();
+        showDialogue([{ speaker: 'You', portrait: 'mc', text: "It's gone. For now." }]);
+      });
+    } else {
+      showDialogue([{ speaker: 'You', portrait: 'mc', text: "I put it face-down. My hands are shaking." }]);
+    }
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 10 — ITEM USE FUNCTIONS
+// Each function handles one specific item+context combination.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function useBleachVent() {
+  if (!has('Bleach')) return;
+  removeItem('Bleach');
+  S.flags.fungusAlive = false;
+
+  // Fade out the fungus vine overlay by setting its CSS opacity to 0
+  // (the element has transition:opacity 3s defined inline in the SVG)
+  const vines = document.getElementById('fungus-vines');
+  if (vines) vines.style.opacity = '0';
+
+  document.getElementById('vignette').classList.remove('fungus-active');
+
+  const fc = document.getElementById('fungus-creature');
+  if (fc) { fc.style.opacity = '0'; fc.style.transition = 'opacity 1.5s'; setTimeout(() => fc.remove(), 1500); }
+
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "I pour bleach into the vent. The purple tendrils recoil and blacken." },
+    { speaker: 'You', portrait: 'mc', text: "I throw open the bathroom window just in time. The fumes billow out." },
+    { speaker: 'You', portrait: 'mc', text: "The spreading has stopped." },
+  ]);
+}
+
+function useBleachMold() {
+  if (!has('Bleach')) return;
+  removeItem('Bleach');
+  S.flags.moldAlive = false;
+
+  const mc = document.getElementById('mold-ceiling');
+  if (mc) { mc.style.transition = 'opacity 2s'; mc.style.opacity = '0'; }
+
+  const mc2 = document.getElementById('mold-creature');
+  if (mc2) { mc2.style.transition = 'opacity 1.5s'; mc2.style.opacity = '0'; setTimeout(() => mc2.remove(), 1500); }
+
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "I pour the bleach across the mold. It hisses and goes grey." },
+    { speaker: 'You', portrait: 'mc', text: "The bathroom is clear. I crack the window to vent the fumes." },
+  ]);
+}
+
+// Bleach used while mime is present — the smell drives it away for 1 real minute.
+// setTimeout schedules a single callback after 60 000ms (1 minute).
+function useBleachOnMime() {
+  if (!has('Bleach')) return;
+  removeItem('Bleach');
+  S.flags.mimeActive = false;
+  removeMime();
+
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "I uncap the bleach. The sharp chemical smell fills the room." },
+    { speaker: 'You', portrait: 'mc', text: "The figure recoils and dissolves. It'll be back — but not for a while." },
+  ]);
+
+  // Respawn the mime after 1 real-time minute (60 000ms)
+  setTimeout(() => {
+    if (!S.dead && !S.won) {
+      S.flags.mimeActive = true;
+      respawnMime();
+    }
+  }, 60 * 1000);
+}
+
+function useCameraOnMime() {
+  if (!has('Camera') || !S.flags.mimeActive) return;
+  removeItem('Camera');
+
+  const mb = document.getElementById('mime-creature');
+  if (mb) { mb.style.transition = 'opacity 0.2s'; mb.style.opacity = '0'; setTimeout(() => mb.remove(), 200); }
+  S.flags.mimeActive = false;
+
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "I raise the camera. The flash fires." },
+    { speaker: 'You', portrait: 'mc', text: "The figure blurs at the edges and dissolves. Gone — for about an hour." },
+  ]);
+
+  // Respawn after 1 hour of real time (3 600 000ms)
+  setTimeout(() => {
+    if (!S.dead && !S.won) { S.flags.mimeActive = true; respawnMime(); }
+  }, 60 * 60 * 1000);
+}
+
+function useStopwatch() {
+  if (!has('Stopwatch')) return;
+  removeItem('Stopwatch');
+  S.flags.mimeActive  = false;
+  S.flags.mirrorActive = false;
+  removeMime();
+  document.getElementById('vignette').classList.remove('mirror-active');
+
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "I click the stopwatch." },
+    { speaker: 'You', portrait: 'mc', text: "The room goes quiet. The figure dissolves. The mirror goes dark. Two hours of peace." },
+  ]);
+
+  // Restore both flags after 2 hours of real time (7 200 000ms)
+  setTimeout(() => {
+    if (!S.dead && !S.won) {
+      S.flags.mimeActive   = true;
+      S.flags.mirrorActive = true;
+      respawnMime();
+    }
+  }, 2 * 60 * 60 * 1000);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 11 — SPAWN FUNCTIONS: ITEMS
+// Each spawn function creates an SVG <g> element and appends it to the relevant
+// room's creature/item group. A flag prevents double-spawning.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function spawnCloth() {
+  if (S.flags.clothSpawned) return;
+  S.flags.clothSpawned = true;
+
+  // createElementNS is required for SVG elements (regular createElement won't work)
+  const g = document.getElementById('living-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.id = 'cloth-item';
+  el.setAttribute('class', 'clickable');
+  // Template literal builds the inner SVG markup as a string
+  el.innerHTML = `
+    <image href="assets/item_cloth.png" x="130" y="240" width="50" height="40" preserveAspectRatio="xMidYMid meet"/>
+    <text x="155" y="292" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">CLOTH</text>`;
+  el.onclick = () => {
+    addItem('Cloth');
+    el.remove();
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "An old cloth on the couch. It could seal something." }]);
+  };
+  g.appendChild(el);
+}
+
+function spawnShard() {
+  if (S.flags.shardSpawned) return;
+  S.flags.shardSpawned = true;
+  S.flags.mirrorActive = true; // mirror becomes dangerous once shard exists
+
+  const g = document.getElementById('bedroom-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.setAttribute('class', 'clickable');
+  el.id = 'shard-item';
+  el.innerHTML = `
+    <image href="assets/item_shard.png" x="675" y="218" width="40" height="35" preserveAspectRatio="xMidYMid meet"/>
+    <text x="695" y="264" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#5a4040" letter-spacing="1">SHARD</text>`;
+  el.onclick = () => {
+    addItem('Mirror Shard');
+    el.remove();
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "A mirror shard on the floor by the dresser. Heavier than glass should be, and faintly warm." }]);
+  };
+  g.appendChild(el);
+}
+
+function spawnMask() {
+  if (S.flags.maskSpawned) return;
+  S.flags.maskSpawned = true;
+
+  const g = document.getElementById('bedroom-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.setAttribute('class', 'clickable');
+  el.id = 'mask-item';
+  el.innerHTML = `
+    <image href="assets/item_mask.png" x="390" y="258" width="80" height="50" preserveAspectRatio="xMidYMid meet"/>
+    <text x="430" y="320" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#5a5040" letter-spacing="1">MASK</text>`;
+  el.onclick = () => {
+    addItem('Mask');
+    el.remove();
+    S.flags.maskWorn = true;
+    if (S.flags.coughing) { S.flags.coughing = false; clearInterval(S.coughTimer); }
+    showDialogue([
+      { speaker: 'You', portrait: 'mc', text: "A mask from the last pandemic. Still sealed." },
+      { speaker: 'You', portrait: 'mc', text: "I put it on. The air tastes clean for the first time tonight." },
+    ]);
+  };
+  g.appendChild(el);
+}
+
+function spawnBleach() {
+  if (S.flags.bleachSpawned) return;
+  S.flags.bleachSpawned = true;
+  S.flags.bleachTaken = false;
+
+  // Visual pulse hint so the player knows to check the cabinet
+  const g = document.getElementById('bathroom-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.id = 'bleach-hint';
+  el.setAttribute('class', 'clickable');
+  el.innerHTML = `
+    <circle cx="135" cy="260" r="14" fill="#c4874a" opacity="0.18"/>
+    <circle cx="135" cy="260" r="7"  fill="#c4874a" opacity="0.4"/>
+    <text x="135" y="285" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#4a4030" letter-spacing="1">cabinet</text>`;
+  el.onclick = () => { el.remove(); goToBathroom(); interactUnderSink(); };
+  g.appendChild(el);
+}
+
+function spawnPolaroid() {
+  if (S.flags.polSpawned) return;
+  S.flags.polSpawned = true;
+  // Simply make the pre-existing shelf-polaroid element visible
+  const p = document.getElementById('shelf-polaroid');
+  if (p) p.style.display = 'block';
+}
+
+function spawnCamera() {
+  if (S.flags.camSpawned) return;
+  S.flags.camSpawned = true;
+
+  const g = document.getElementById('living-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.setAttribute('class', 'clickable');
+  el.id = 'camera-item';
+  el.innerHTML = `
+    <image href="assets/item_camera.png" x="460" y="252" width="70" height="50" preserveAspectRatio="xMidYMid meet"/>
+    <text x="495" y="315" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">CAMERA</text>`;
+  el.onclick = () => {
+    addItem('Camera');
+    el.remove();
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "My camera bag. Film still inside — one good shot, maybe two." }]);
+  };
+  g.appendChild(el);
+}
+
+function spawnStopwatch() {
+  if (S.flags.swSpawned) return;
+  S.flags.swSpawned = true;
+
+  const g = document.getElementById('bedroom-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.setAttribute('class', 'clickable');
+  el.id = 'sw-item';
+  el.innerHTML = `
+    <image href="assets/item_stopwatch.png" x="336" y="248" width="44" height="44" preserveAspectRatio="xMidYMid meet"/>
+    <text x="358" y="304" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">STOPWATCH</text>`;
+  el.onclick = () => {
+    addItem('Stopwatch');
+    el.remove();
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "A stopwatch on the nightstand. It's already running. When I hold it, the room feels quieter." }]);
+  };
+  g.appendChild(el);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 12 — SPAWN FUNCTIONS: CREATURES
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function spawnMold() {
+  if (S.flags.moldSpawned) return;
+  S.flags.moldSpawned = true;
+  S.flags.moldAlive   = true;
+
+  const mc = document.getElementById('mold-ceiling');
+  if (mc) mc.style.opacity = '1';
+
+  const g = document.getElementById('bathroom-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.setAttribute('class', 'creature-sprite');
+  el.id = 'mold-creature';
+  el.innerHTML = `
+    <image href="assets/sprite_mold.png" x="310" y="80" width="160" height="190" preserveAspectRatio="xMidYMid meet"/>
+    <text x="390" y="282" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#4a6a20" letter-spacing="1">[ speak ]</text>`;
+  el.onclick = () => talkMold();
+  g.appendChild(el);
+
+  goToBathroom();
+  setTimeout(() => showDialogue([
+    { speaker: 'The Mold', portrait: 'mold', text: "I've been here longer than you know." },
+    { speaker: 'The Mold', portrait: 'mold', text: "You cleaned this bathroom twice in spring. I remember." },
+  ]), 900);
+}
+
+function talkMold() {
+  if (!S.flags.moldAlive) {
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "Just a stain now. It looks smaller than it felt." }]);
+    return;
+  }
+  if (!has('Mask')) {
+    showDialogue([
+      { speaker: 'The Mold', portrait: 'mold', text: "Come closer. You should breathe me in." },
+      { speaker: 'You', portrait: 'mc', text: "I can feel it already. I need the mask before I can deal with this." },
+    ]);
+    if (!S.flags.coughing) startCoughing();
+    return;
+  }
+  showChoices([
+    { label: 'Talk to it', fn: () => showDialogue([
+      { speaker: 'The Mold', portrait: 'mold', text: "You stopped watering the plants two months ago. I moved in after them." },
+      { speaker: 'The Mold', portrait: 'mold', text: "I'm not unkind. I break things down. That's all I do." },
+      { speaker: 'You', portrait: 'mc', text: "I know what you are. And I know what you're not." },
+    ])},
+    { label: 'Use bleach on the mold', fn: () => has('Bleach')
+        ? useBleachMold()
+        : showDialogue([{ speaker: 'You', portrait: 'mc', text: "I'd need bleach first." }]) },
+    { label: 'Leave it alone (mask protects you)', fn: () =>
+        showDialogue([{ speaker: 'You', portrait: 'mc', text: "I close the bathroom door. The mask will keep me safe." }]) },
+  ]);
+}
+
+function spawnMime() {
+  if (S.flags.mimeSpawned) return;
+  S.flags.mimeSpawned = true;
+  S.flags.mimeActive  = true;
+
+  const g = document.getElementById('living-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.setAttribute('class', 'creature-sprite');
+  el.id = 'mime-creature';
+  el.innerHTML = `
+    <image href="assets/sprite_mime.png" x="685" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
+    <text x="750" y="442" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#2a4a8a" letter-spacing="1">[ speak ]</text>`;
+  el.onclick = () => talkMime();
+  g.appendChild(el);
+
+  goToLiving();
+  setTimeout(() => showDialogue([
+    { speaker: 'The Mime', portrait: 'mime', text: "..." },
+    { speaker: 'You', portrait: 'mc', text: "There's a figure in the living room. Standing very still near the bookshelf." },
+    { speaker: 'You', portrait: 'mc', text: "It turns to look at me. It doesn't have a face I recognize." },
+  ]), 700);
+}
+
+function talkMime() {
+  if (!S.flags.mimeActive) {
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "It was there. Now it isn't." }]);
+    return;
+  }
+  showChoices([
+    { label: 'Ask who they are', fn: () => showDialogue([
+      { speaker: 'The Mime', portrait: 'mime', text: "..." },
+      { speaker: 'The Mime', portrait: 'mime', text: "..." },
+      { speaker: 'You', portrait: 'mc', text: "It doesn't speak. It only mirrors something I can't name." },
+    ])},
+    { label: 'Use camera on them', fn: () => has('Camera')
+        ? useCameraOnMime()
+        : showDialogue([{ speaker: 'You', portrait: 'mc', text: "If I had the camera... a flash might break its attention." }]) },
+    { label: 'Look at the Polaroid (triggers vision)', fn: () => has('Polaroid')
+        ? interactPolaroid()
+        : showDialogue([{ speaker: 'You', portrait: 'mc', text: "The photograph in the living room... I'd need it in my hand." }]) },
+    { label: 'Use stopwatch', fn: () => has('Stopwatch')
+        ? useStopwatch()
+        : showDialogue([{ speaker: 'You', portrait: 'mc', text: "I need something that can reach it." }]) },
+  ]);
+}
+
+function removeMime() {
+  S.flags.mimeActive = false;
+  const mb = document.getElementById('mime-creature');
+  if (mb) { mb.style.transition = 'opacity 1s'; mb.style.opacity = '0'; setTimeout(() => mb.remove(), 1000); }
+}
+
+function respawnMime() {
+  const old = document.getElementById('mime-creature');
+  if (old) old.remove();
+
+  const g = document.getElementById('living-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.setAttribute('class', 'creature-sprite');
+  el.id = 'mime-creature';
+  // Slightly different x position on respawn — suggests it moved while gone
+  el.innerHTML = `
+    <image href="assets/sprite_mime.png" x="530" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
+    <text x="595" y="442" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#2a4a8a" letter-spacing="1">[ speak ]</text>`;
+  el.onclick = () => talkMime();
+  g.appendChild(el);
+}
+
+function spawnFungus() {
+  if (S.flags.fungSpawned) return;
+  S.flags.fungSpawned = true;
+  S.flags.fungusAlive = true;
+
+  const vines = document.getElementById('fungus-vines');
+  if (vines) vines.style.opacity = '1';
+  document.getElementById('vignette').classList.add('fungus-active');
+
+  const g = document.getElementById('bathroom-creatures');
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  el.setAttribute('class', 'creature-sprite');
+  el.id = 'fungus-creature';
+  el.innerHTML = `
+    <image href="assets/sprite_fungus.png" x="380" y="60" width="240" height="280" preserveAspectRatio="xMidYMid meet"/>
+    <text x="500" y="352" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#8a3a9a" letter-spacing="1">[ speak ]</text>`;
+  el.onclick = () => talkFungus();
+  g.appendChild(el);
+
+  goToBathroom();
+  setTimeout(() => showDialogue([
+    { speaker: 'The Fungus', portrait: 'fungus', text: "The air carried me here." },
+    { speaker: 'The Fungus', portrait: 'fungus', text: "Your walls let me in." },
+  ]), 700);
+}
+
+function talkFungus() {
+  if (!S.flags.fungusAlive) {
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "Just a purple stain. Retreating now." }]);
+    return;
+  }
+  showChoices([
+    { label: 'Talk to it', fn: () => showDialogue([
+      { speaker: 'The Fungus', portrait: 'fungus', text: "I don't want anything from you. I don't want anything at all." },
+      { speaker: 'The Fungus', portrait: 'fungus', text: "I grow toward warmth. You are warm. That's all this is." },
+      { speaker: 'You', portrait: 'mc', text: "I understand. That makes it worse, somehow." },
+    ])},
+    { label: 'Use bleach on the vent', fn: () => has('Bleach')
+        ? useBleachVent()
+        : showDialogue([{ speaker: 'You', portrait: 'mc', text: "I need the bleach from under the sink first." }]) },
+  ]);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 13 — PHASE 2 & SIBLING
+// Phase 2 begins at the 40% mark. The sibling apparition spawns sometime after.
+// setTimeout with a random offset (Math.random()*60000) staggers the appearance.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function startPhase2() {
+  S.phase = 2;
+
+  if (!S.flags.maskWorn && !has('Mask')) {
+    die('Consumed by the Air',
+      'You made it to 10PM without finding the mask. The spores had been in the house for hours by then. The radio kept playing static to an empty room.',
+      'bad');
+    return;
+  }
+
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "It's 10 PM. The house is as ready as it's going to be." },
+    { speaker: 'You', portrait: 'mc', text: "The radio said dawn. That's still hours away." },
+    { speaker: 'You', portrait: 'mc', text: "I should find the journal pages I left around the house. I kept writing things down because I kept forgetting." },
+  ]);
+
+  // Sibling apparition appears 30–90 seconds into phase 2
+  setTimeout(() => {
+    if (!S.dead && !S.won && !S.flags.sibSpawned) {
+      S.flags.sibSpawned = true;
+      const g = document.getElementById('living-creatures');
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      el.setAttribute('class', 'creature-sprite');
+      el.id = 'sibling-creature';
+      el.style.opacity = '0.7';
+      el.innerHTML = `
+        <image href="assets/sprite_sibling.png" x="190" y="130" width="120" height="250" preserveAspectRatio="xMidYMid meet"/>
+        <text x="250" y="390" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#5a5060" letter-spacing="1">[ speak ]</text>`;
+      el.onclick = () => talkSibling();
+      g.appendChild(el);
+    }
+  }, 30000 + Math.random() * 60000);
+}
+
+function talkSibling() {
+  if (!S.flags.sibIdx) S.flags.sibIdx = 0;
+
+  // Each element of this array is itself a dialogue queue (array of lines).
+  // sibIdx selects which conversation plays; Math.min prevents out-of-bounds.
+  const conversations = [
+    [{ speaker: '—', portrait: 'sibling', text: "You stopped picking up." }],
+    [
+      { speaker: '—', portrait: 'sibling', text: "We left without you because we thought you weren't coming." },
+      { speaker: '—', portrait: 'sibling', text: "That's what I told myself." },
+    ],
+    [
+      { speaker: 'You', portrait: 'mc', text: "Are you really here?" },
+      { speaker: '—',   portrait: 'sibling', text: "No. You know that." },
+    ],
+  ];
+
+  showDialogue(conversations[Math.min(S.flags.sibIdx, conversations.length - 1)]);
+  S.flags.sibIdx++;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 14 — COUGHING (mold exposure without mask)
+// An interval fires every 4 seconds to pulse a red vignette.
+// A separate setTimeout fires the death after 5 minutes of exposure.
+// Both are cancelled if the mask is found or the mold is killed.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function startCoughing() {
+  if (S.flags.coughing) return;
+  S.flags.coughing = true;
+
+  // Visual pulse: red vignette flash every 4 seconds
+  S.coughTimer = setInterval(() => {
+    if (S.dead || S.won) { clearInterval(S.coughTimer); return; }
+    if (S.flags.maskWorn) { clearInterval(S.coughTimer); S.flags.coughing = false; return; }
+
+    const v = document.getElementById('vignette');
+    v.style.boxShadow = 'inset 0 0 180px 60px rgba(180,60,20,0.45)';
+    setTimeout(() => {
+      if (!S.flags.fungusAlive) v.style.boxShadow = 'inset 0 0 180px 60px rgba(0,0,0,0.7)';
+    }, 500);
+  }, 4000);
+
+  // Death after 5 minutes (300 000ms) of continuous unmasked exposure
+  setTimeout(() => {
+    if (!S.dead && !S.won && S.flags.coughing && !S.flags.maskWorn) {
+      die('Death by Virus',
+        'The Thermophilic Fungal Virus consumed you. You collapsed coughing, far from help, far from morning.\n\nThe alarm clock kept playing static into an empty room.',
+        'bad');
+    }
+  }, 300000);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 15 — FINAL CHOICE & ENDINGS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function finalChoice() {
+  if (S.dead || S.won) return;
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "4 AM. The storm is thinning. I can hear something outside — an engine." },
+    { speaker: 'You', portrait: 'mc', text: "The radio: '...final evacuation pass at dawn. Eastern corridor cleared...'" },
+    { speaker: 'You', portrait: 'mc', text: "I have to decide." },
+  ], () => showChoices([
+    { label: 'Flee — run for the vehicle at dawn', fn: chooseFlee },
+    { label: "Stay — I'm not ready to leave",      fn: chooseStay },
+  ]));
+}
+
+function chooseFlee() {
+  if (has('Mask') || S.flags.maskWorn) {
+    showDialogue([
+      { speaker: 'You', portrait: 'mc', text: "I put on the mask. I grab the journal. I open the front door for the first time in weeks." },
+      { speaker: 'You', portrait: 'mc', text: "The air is orange with sand and pre-dawn light. The vehicle is at the end of the block." },
+      { speaker: 'You', portrait: 'mc', text: "I run." },
+    ], () => win('Good End — You Leave',
+      'You ran for the vehicle with the mask on and your journal under your arm. The driver looked surprised.\n\nDawn came up pink and hazy as you drove east.\n\nThree days later: the family reveal. They evacuated in the first wave. They thought you were gone. You thought the same about them.\n\nThe apocalypse had been slow and quiet, the way most things end. You were just the last to leave the room.'));
+  } else {
+    showDialogue([
+      { speaker: 'You', portrait: 'mc', text: "I step outside without the mask. The hot morning air is full of something I can't see." },
+      { speaker: 'You', portrait: 'mc', text: "I make it half a block." },
+    ], () => die('So Close',
+      "The spores were in every breath of dawn air. The vehicle passed at sunrise. It didn't stop.",
+      'bad'));
+  }
+}
+
+function chooseStay() {
+  showDialogue([
+    { speaker: 'You', portrait: 'mc', text: "I sit back down. I don't think I remember how to leave." },
+    { speaker: 'You', portrait: 'mc', text: "I hear the vehicles pass outside." },
+  ], () => {
+    if (S.flags.fungusAlive) {
+      showDialogue([
+        { speaker: 'The Fungus', portrait: 'fungus', text: "I knew you'd stay." },
+        { speaker: 'You', portrait: 'mc', text: "By mid-morning the purple blooms covered the ceiling. By noon, I couldn't move." },
+      ], () => die('The Fungus Stays Too', 'The fungus completed what the night started. The house was quiet after that.', 'bad-fungus'));
+    } else {
+      showDialogue([
+        { speaker: 'You', portrait: 'mc', text: "Dawn comes. The storm clears by morning." },
+        { speaker: 'You', portrait: 'mc', text: "I'm still here. I don't know what that means yet." },
+      ], () => win('Survived — Alone',
+        "You made it to morning. The house held.\n\nThe mold, the mirror, the pale figure — gone with the dark.\n\nYou found out later your family had evacuated in the first wave. They thought you were gone. You thought the same.\n\nThe apocalypse was never the virus. It was all the doors that stayed closed before it arrived."));
+    }
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 16 — WIN / DEATH
+// Both functions guard against double-triggering with S.dead / S.won flags.
+// The end screen is shown after a short delay so any final dialogue can finish.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Maps ending class strings to title colours
+const ENDING_COLOURS = {
+  'bad':        '#d44040',
+  'bad-fungus': '#c060c0',
+};
+
+function die(title, text, cls) {
+  if (S.dead || S.won) return;
+  S.dead    = true;
+  S.running = false;
+
+  setTimeout(() => {
+    const es = document.getElementById('end-screen');
+    es.style.display = 'flex';
+    document.getElementById('end-title').style.color = ENDING_COLOURS[cls] || ENDING_COLOURS['bad'];
+    document.getElementById('end-sub').textContent   = 'ending';
+    document.getElementById('end-title').textContent = title;
+    document.getElementById('end-text').textContent  = text;
+  }, 1800);
+}
+
+function win(title, text) {
+  if (S.dead || S.won) return;
+  S.won     = true;
+  S.running = false;
+
+  setTimeout(() => {
+    const es = document.getElementById('end-screen');
+    es.style.display = 'flex';
+    document.getElementById('end-title').style.color = '#5dc47a';
+    document.getElementById('end-sub').textContent   = 'ending';
+    document.getElementById('end-title').textContent = title;
+    document.getElementById('end-text').textContent  = text;
+  }, 1800);
+}
+</script>
+</body>
+</html>
