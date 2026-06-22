@@ -137,15 +137,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
 <!--  Radio lines -->
 <div id="radio-screen">
   <div id="radio-text">
-    <span class="radio-line static" id="r0">— — — - — — —</span>
+    <span class="radio-line static" id="r0">— — — ◈ — — —</span>
     <span class="radio-line static" id="r1">...static...</span>
     <span class="radio-line signal" id="r2">eastern district evacuation order remains in effect</span>
     <span class="radio-line static" id="r3">...static...</span>
-    <span class="radio-line signal" id="r4">heat storm warning. do not open doors or windows.</span>
+    <span class="radio-line signal" id="r4">fungal count: critical. do not open doors or windows.</span>
     <span class="radio-line static" id="r5">...if you are hearing this...</span>
     <span class="radio-line signal" id="r6">evacuation vehicles will make one final pass at dawn.</span>
     <span class="radio-line static" id="r7">...more static...</span>
-    <span class="radio-line static" id="r8">— — — - — — —</span>
+    <span class="radio-line static" id="r8">— — — ◈ — — —</span>
   </div>
 </div>
 
@@ -154,10 +154,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
   <div id="mono-text">
     <span class="mono-line" id="m0">I don't know how long I've been in the bedroom.</span><br><br>
     <span class="mono-line" id="m1">My journal has dates… but I can’t remember if I’ve been keeping track. The gaps are too big…</span><br><br>
-    <span class="mono-line" id="m2">I’m starting to see things again…<br>I know they aren't real.</span><br><br>
-    <span class="mono-line" id="m3">There's a crack in the window. I can hear it... I should seal it soon.</span><br><br>
-    <span class="mono-line" id="m4">Something is happening outside again.</span><br><br>
-    <span class="mono-line" id="m5">I need to move.</span>
+    <span class="mono-line" id="m3">There's a crack in the window. I can hear it… a thin hiss,<br>hot air bleeding through. I should seal it before anything gets in.</span><br><br>
   </div>
   <button class="screen-btn" id="mono-skip" style="display:none" onclick="startGame()">— begin —</button>
 </div>
@@ -187,7 +184,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
 
         <!-- window -->
         <g class="clickable" onclick="clickHotspot('window')">
+          <image href="assets/obj_window.png" x="80" y="30" width="160" height="270" preserveAspectRatio="xMidYMid meet"/>
           <g id="window-crack-glow">
+            <image href="assets/fx_window_crack.png" x="80" y="30" width="160" height="270" preserveAspectRatio="xMidYMid meet"/>
             <!-- crack lines -->
             <line x1="148" y1="110" x2="162" y2="195" stroke="#c4874a" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
             <line x1="162" y1="195" x2="155" y2="240" stroke="#c4874a" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
@@ -198,23 +197,27 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
 
         <!-- the clock -->
         <g class="clickable" onclick="clickHotspot('clock')">
+          <image href="assets/obj_clock.png" x="808" y="248" width="75" height="80" preserveAspectRatio="xMidYMid meet"/>
           <text x="840" y="342" text-anchor="middle" class="hs-label">CLOCK</text>
           <text x="840" y="276" text-anchor="middle" font-family="'Share Tech Mono'" font-size="10" fill="#c4874a" id="clock-face-text">6:00 PM</text>
         </g>
 
         <!-- 30% chance of being killed by the mirror!!!!! -->
         <g class="clickable" onclick="clickHotspot('mirror')">
+          <image href="assets/obj_mirror.png" x="670" y="20" width="130" height="200" preserveAspectRatio="xMidYMid meet"/>
           <rect x="677" y="27" width="116" height="176" fill="#3a2020" opacity="0.07" id="mirror-tint"/>
           <text x="735" y="234" text-anchor="middle" class="hs-label">MIRROR</text>
         </g>
 
         <!-- Journal -->
         <g class="clickable" onclick="clickHotspot('journal')">
+          <image href="assets/obj_journal.png" x="310" y="240" width="70" height="55" preserveAspectRatio="xMidYMid meet"/>
           <text x="349" y="310" text-anchor="middle" class="hs-label">JOURNAL</text>
         </g>
 
         <!-- DOOR to living room -->
         <g class="clickable" onclick="goToLiving()">
+          <image href="assets/obj_door.png" x="882" y="100" width="95" height="225" preserveAspectRatio="xMidYMid meet"/>
           <text x="929" y="340" text-anchor="middle" class="hs-label">LIVING →</text>
         </g>
 
@@ -227,23 +230,28 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
         <image href="assets/bg_living.png" x="0" y="0" width="1000" height="560" preserveAspectRatio="xMidYMid slice"/>
 
         <g class="clickable" onclick="clickHotspot('sink')">
+          <image href="assets/obj_kitchen.png" x="575" y="160" width="300" height="160" preserveAspectRatio="xMidYMid meet"/>
           <text x="725" y="336" text-anchor="middle" class="hs-label">Kitchen</text>
         </g>
 
         <g class="clickable" onclick="clickHotspot('shelf')">
+          <image href="assets/obj_shelf.png" x="40" y="90" width="130" height="220" preserveAspectRatio="xMidYMid meet"/>
           <text x="105" y="326" text-anchor="middle" class="hs-label">SHELF</text>
         </g>
 
         <!-- polaroid spaen!! -->
         <g id="shelf-polaroid" class="clickable" onclick="clickHotspot('polaroid')" style="display:none">
+          <image href="assets/obj_polaroid.png" x="122" y="224" width="40" height="50" preserveAspectRatio="xMidYMid meet"/>
           <text x="142" y="285" text-anchor="middle" class="hs-label">PHOTO</text>
         </g>
 
         <g class="clickable" onclick="goToBathroom()">
+          <image href="assets/obj_door.png" x="370" y="100" width="90" height="215" preserveAspectRatio="xMidYMid meet"/>
           <text x="415" y="330" text-anchor="middle" class="hs-label">BATH →</text>
         </g>
 
         <g class="clickable" onclick="goToBedroom()">
+          <image href="assets/obj_door.png" x="0" y="100" width="55" height="215" preserveAspectRatio="xMidYMid meet"/>
           <text x="27" y="330" text-anchor="middle" class="hs-label">← BED</text>
         </g>
 
@@ -254,22 +262,26 @@ html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;cur
       <g id="room-bathroom" style="display:none">
         <image href="assets/bg_bathroom.png" x="0" y="0" width="1000" height="560" preserveAspectRatio="xMidYMid slice"/>
 
-        <image id="mold-ceiling" href=""
+        <!-- MOLDDDDD -->
+        <image id="mold-ceiling" href="assets/fx_mold_ceiling.png"
                x="200" y="0" width="600" height="200"
                preserveAspectRatio="xMidYMid meet" opacity="0" style="transition:opacity 3s"/>
-        <image id="fungus-vines" href=""
+        <image id="fungus-vines" href="assets/fx_fungus_vines.png"
                x="0" y="0" width="1000" height="560"
                preserveAspectRatio="xMidYMid slice" opacity="0" style="transition:opacity 3s"/>
 
         <g class="clickable" onclick="clickHotspot('undersink')">
-          <text x="232.5" y="562.5" text-anchor="middle" class="hs-label">CABINET</text>
+          <image href="assets/obj_cabinet.png" x="70" y="185" width="130" height="145" preserveAspectRatio="xMidYMid meet"/>
+          <text x="135" y="345" text-anchor="middle" class="hs-label">CABINET</text>
         </g>
 
         <g class="clickable" onclick="clickHotspot('vent')">
+          <image href="assets/obj_vent.png" x="270" y="90" width="90" height="65" preserveAspectRatio="xMidYMid meet"/>
           <text x="315" y="170" text-anchor="middle" class="hs-label">VENT</text>
         </g>
 
         <g class="clickable" onclick="goToLiving()">
+          <image href="assets/obj_door.png" x="0" y="100" width="62" height="225" preserveAspectRatio="xMidYMid meet"/>
           <text x="31" y="340" text-anchor="middle" class="hs-label">← BACK</text>
         </g>
 
@@ -317,15 +329,17 @@ const PORTRAITS = {
   mc:          'assets/portrait_mc.png',
   mold:        'assets/portrait_mold.png',
   mime:        'assets/portrait_mime.png',
-  mirror_self: 'assets/portrait_mc.png',
+  mirror_self: 'assets/portrait_mirror_self.png',
   fungus:      'assets/portrait_fungus.png',
   sibling:     'assets/portrait_sibling.png',
 };
 
 // Creature sprite pahts
 const SPRITES = {
-  mold: 'assets/sprite_silhouette.png',
-  mime: 'assets/sprite_silhouette.png',
+  mold:    'assets/sprite_mold.png',
+  mime:    'assets/sprite_mime.png',
+  fungus:  'assets/sprite_fungus.png',
+  sibling: 'assets/sprite_sibling.png',
 };
 
 // Item sprite s
@@ -403,20 +417,6 @@ const firedEvents = new Set();
 // resolved event trigger times fraction
 // built once at startup randomising
 const EVENT_TARGETS = {};
-Object.entries(EVENT_WINDOWS).forEach(([id, [lo, hi]]) => {
-  // math random returns 0 1
-  EVENT_TARGETS[id] = lo + Math.random() * (hi - lo);
-});
-
-// dialogue queue state shared across
-let dialogueQueue = [];   // array of {speaker, portrait, text} objects
-let dialogueIndex = 0;    // index of the currently displayed line
-let dialogueCallback = null; // optional function called when the queue ends
-let typingTimer = null;   // interval handle for the typewriter character effect
-
-// polaroid hold trigger tracks player
-// keep selected 3+ seconds mime
-let polaroidHeldSince = null; // Date.now() timestamp, or null if not held
 
 
 //
@@ -698,26 +698,7 @@ function renderInv() {
 //
 
 function clickHotspot(id) {
-  if (S.activeItem) return useItemOn(S.activeItem, id);
 
-  // dispatch table maps hotspot id
-  const handlers = {
-    window:    interactWindow,
-    clock:     interactClock,
-    mirror:    interactMirror,
-    journal:   interactJournal,
-    sink:      interactSink,
-    shelf:     interactShelf,
-    undersink: interactUnderSink,
-    vent:      interactVent,
-    polaroid:  interactPolaroid,
-  };
-
-  handlers[id]?.();
-}
-
-// item use routing
-// route item+target combos right handler
 function useItemOn(item, target) {
   S.activeItem = null;
   renderInv();
@@ -838,6 +819,7 @@ function interactMirror() {
   ]);
 }
 
+
 function breakMirror() {
   if (!has('Mirror Shard')) return;
   removeItem('Mirror Shard');
@@ -856,8 +838,8 @@ function breakMirror() {
 function interactJournal() {
   if (!S.flags.journalPage) S.flags.journalPage = 0;
 
-  // journal pages array strings indexed
-  // math min clamps index last
+    { speaker: 'You', portrait: 'mc', text: "Books I haven't opened in months." },
+    { speaker: 'You', portrait: 'mc', text: "There's a Polaroid on the lower shelf. I recognize the person in it." },
   const pages = [
     "I stopped going outside in March. Maybe April. I told myself it was the virus. But the virus came later.",
     "I wrote everything down because I kept forgetting. Who I talked to. What I ate. What day it was.",
@@ -927,8 +909,8 @@ function interactPolaroid() {
     return;
   }
 
-  // player polaroid clicks shelf location
-  // show grief reaction mime present
+}
+
   showDialogue([
     { speaker: 'You', portrait: 'mc', text: "I look at the photo. Five seconds. Six." },
     { speaker: 'You', portrait: 'mc', text: "The grief is sudden and complete. The room tilts." },
@@ -951,21 +933,20 @@ function interactPolaroid() {
 }
 
 
-//
-// item use functions
-// item use handlers
-//
+    { speaker: 'You', portrait: 'mc', text: "I pour bleach into the vent. The purple tendrils recoil and blacken." },
+    { speaker: 'You', portrait: 'mc', text: "I throw open the bathroom window just in time. The fumes billow out." },
+    { speaker: 'You', portrait: 'mc', text: "The spreading has stopped." },
+  ]);
 
 function useBleachVent() {
   if (!has('Bleach')) return;
   removeItem('Bleach');
   S.flags.fungusAlive = false;
 
-  // fade out fungus vine overlay
-  // element transition opacity 3s defined
+
+  const mc = document.getElementById('mold-ceiling');
   const vines = document.getElementById('fungus-vines');
   if (vines) vines.style.opacity = '0';
-
   document.getElementById('vignette').classList.remove('fungus-active');
 
   const fc = document.getElementById('fungus-creature');
@@ -995,8 +976,8 @@ function useBleachMold() {
   ]);
 }
 
-// bleach used mime present smell
-// settimeout schedules single callback 60
+}
+
 function useBleachOnMime() {
   if (!has('Bleach')) return;
   removeItem('Bleach');
@@ -1008,7 +989,7 @@ function useBleachOnMime() {
     { speaker: 'You', portrait: 'mc', text: "The figure recoils and dissolves. It'll be back — but not for a while." },
   ]);
 
-  // respawn mime 1 real time
+  ]);
   setTimeout(() => {
     if (!S.dead && !S.won) {
       S.flags.mimeActive = true;
@@ -1030,7 +1011,7 @@ function useCameraOnMime() {
     { speaker: 'You', portrait: 'mc', text: "The figure blurs at the edges and dissolves. Gone — for about an hour." },
   ]);
 
-  // respawn 1 hour real time
+  setTimeout(() => {
   setTimeout(() => {
     if (!S.dead && !S.won) { S.flags.mimeActive = true; respawnMime(); }
   }, 60 * 60 * 1000);
@@ -1049,7 +1030,7 @@ function useStopwatch() {
     { speaker: 'You', portrait: 'mc', text: "The room goes quiet. The figure dissolves. The mirror goes dark. Two hours of peace." },
   ]);
 
-  // restore both flags 2 hours
+
   setTimeout(() => {
     if (!S.dead && !S.won) {
       S.flags.mimeActive   = true;
@@ -1060,24 +1041,25 @@ function useStopwatch() {
 }
 
 
-//
-// spawn functions items
-// spawn item svg stuff
-// room's creature item group flag
-//
+    el.remove();
+    showDialogue([{ speaker: 'You', portrait: 'mc', text: "An old cloth on the couch. It could seal something." }]);
+  };
+  g.appendChild(el);
+}
 
 function spawnCloth() {
   if (S.flags.clothSpawned) return;
   S.flags.clothSpawned = true;
 
-  // createelementns required svg elements regular
+
   const g = document.getElementById('living-creatures');
   const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   el.id = 'cloth-item';
   el.setAttribute('class', 'clickable');
-  // template literal builds inner svg
   el.innerHTML = `
-    <text x="155" y="292" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">CLOTH</text>`;
+  el.innerHTML = `
+    <image href="assets/item_cloth.png" x="130" y="240" width="50" height="40" preserveAspectRatio="xMidYMid meet"/>
+    <text x="155" y="292" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">CLOTH</text>
   el.onclick = () => {
     addItem('Cloth');
     el.remove();
@@ -1096,6 +1078,7 @@ function spawnShard() {
   el.setAttribute('class', 'clickable');
   el.id = 'shard-item';
   el.innerHTML = `
+    <image href="assets/item_shard.png" x="675" y="218" width="40" height="35" preserveAspectRatio="xMidYMid meet"/>
     <text x="695" y="264" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#5a4040" letter-spacing="1">SHARD</text>`;
   el.onclick = () => {
     addItem('Mirror Shard');
@@ -1114,6 +1097,7 @@ function spawnMask() {
   el.setAttribute('class', 'clickable');
   el.id = 'mask-item';
   el.innerHTML = `
+    <image href="assets/item_mask.png" x="390" y="258" width="80" height="50" preserveAspectRatio="xMidYMid meet"/>
     <text x="430" y="320" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#5a5040" letter-spacing="1">MASK</text>`;
   el.onclick = () => {
     addItem('Mask');
@@ -1133,7 +1117,7 @@ function spawnBleach() {
   S.flags.bleachSpawned = true;
   S.flags.bleachTaken = false;
 
-  // visual pulse hint player knows
+  S.flags.camSpawned = true;
   const g = document.getElementById('bathroom-creatures');
   const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   el.id = 'bleach-hint';
@@ -1149,7 +1133,7 @@ function spawnBleach() {
 function spawnPolaroid() {
   if (S.flags.polSpawned) return;
   S.flags.polSpawned = true;
-  // simply make pre existing shelf
+function spawnStopwatch() {
   const p = document.getElementById('shelf-polaroid');
   if (p) p.style.display = 'block';
 }
@@ -1163,6 +1147,7 @@ function spawnCamera() {
   el.setAttribute('class', 'clickable');
   el.id = 'camera-item';
   el.innerHTML = `
+    <image href="assets/item_camera.png" x="460" y="252" width="70" height="50" preserveAspectRatio="xMidYMid meet"/>
     <text x="495" y="315" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">CAMERA</text>`;
   el.onclick = () => {
     addItem('Camera');
@@ -1181,6 +1166,7 @@ function spawnStopwatch() {
   el.setAttribute('class', 'clickable');
   el.id = 'sw-item';
   el.innerHTML = `
+    <image href="assets/item_stopwatch.png" x="336" y="248" width="44" height="44" preserveAspectRatio="xMidYMid meet"/>
     <text x="358" y="304" text-anchor="middle" font-family="'Share Tech Mono'" font-size="8" fill="#3a3020" letter-spacing="1">STOPWATCH</text>`;
   el.onclick = () => {
     addItem('Stopwatch');
@@ -1191,9 +1177,9 @@ function spawnStopwatch() {
 }
 
 
-//
-// spawn functions creatures
-//
+    { speaker: 'The Mold', portrait: 'mold', text: "You cleaned this bathroom twice in spring. I remember." },
+  ]), 900);
+}
 
 function spawnMold() {
   if (S.flags.moldSpawned) return;
@@ -1208,7 +1194,7 @@ function spawnMold() {
   el.setAttribute('class', 'creature-sprite');
   el.id = 'mold-creature';
   el.innerHTML = `
-    <image href="assets/sprite_silhouette.png" x="310" y="80" width="160" height="190" preserveAspectRatio="xMidYMid meet"/>
+    <image href="assets/sprite_mold.png" x="310" y="80" width="160" height="190" preserveAspectRatio="xMidYMid meet"/>
     <text x="390" y="282" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#4a6a20" letter-spacing="1">[ speak ]</text>`;
   el.onclick = () => talkMold();
   g.appendChild(el);
@@ -1257,7 +1243,7 @@ function spawnMime() {
   el.setAttribute('class', 'creature-sprite');
   el.id = 'mime-creature';
   el.innerHTML = `
-    <image href="assets/sprite_silhouette.png" x="685" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
+    <image href="assets/sprite_mime.png" x="685" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
     <text x="750" y="442" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#2a4a8a" letter-spacing="1">[ speak ]</text>`;
   el.onclick = () => talkMime();
   g.appendChild(el);
@@ -1307,9 +1293,9 @@ function respawnMime() {
   const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   el.setAttribute('class', 'creature-sprite');
   el.id = 'mime-creature';
-  // slightly different position respawn suggests
+
   el.innerHTML = `
-    <image href="assets/sprite_silhouette.png" x="530" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
+    <image href="assets/sprite_mime.png" x="530" y="120" width="130" height="310" preserveAspectRatio="xMidYMid meet"/>
     <text x="595" y="442" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#2a4a8a" letter-spacing="1">[ speak ]</text>`;
   el.onclick = () => talkMime();
   g.appendChild(el);
@@ -1329,6 +1315,7 @@ function spawnFungus() {
   el.setAttribute('class', 'creature-sprite');
   el.id = 'fungus-creature';
   el.innerHTML = `
+    <image href="assets/sprite_fungus.png" x="380" y="60" width="240" height="280" preserveAspectRatio="xMidYMid meet"/>
     <text x="500" y="352" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#8a3a9a" letter-spacing="1">[ speak ]</text>`;
   el.onclick = () => talkFungus();
   g.appendChild(el);
@@ -1358,11 +1345,11 @@ function talkFungus() {
 }
 
 
-//
-// phase 2 sibling
-// phase 2 starts at 40
-// sibling shows up random delay
-//
+      const g = document.getElementById('living-creatures');
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      el.setAttribute('class', 'creature-sprite');
+      el.id = 'sibling-creature';
+      el.style.opacity = '0.7';
 
 function startPhase2() {
   S.phase = 2;
@@ -1380,7 +1367,7 @@ function startPhase2() {
     { speaker: 'You', portrait: 'mc', text: "I should find the journal pages I left around the house. I kept writing things down because I kept forgetting." },
   ]);
 
-  // sibling apparition appears 30 90
+      { speaker: '—', portrait: 'sibling', text: "That's what I told myself." },
   setTimeout(() => {
     if (!S.dead && !S.won && !S.flags.sibSpawned) {
       S.flags.sibSpawned = true;
@@ -1390,6 +1377,7 @@ function startPhase2() {
       el.id = 'sibling-creature';
       el.style.opacity = '0.7';
       el.innerHTML = `
+        <image href="assets/sprite_sibling.png" x="190" y="130" width="120" height="250" preserveAspectRatio="xMidYMid meet"/>
         <text x="250" y="390" text-anchor="middle" font-family="'Share Tech Mono'" font-size="9" fill="#5a5060" letter-spacing="1">[ speak ]</text>`;
       el.onclick = () => talkSibling();
       g.appendChild(el);
@@ -1400,8 +1388,8 @@ function startPhase2() {
 function talkSibling() {
   if (!S.flags.sibIdx) S.flags.sibIdx = 0;
 
-  // element array itself dialogue queue
-  // sibidx selects which conversation plays
+  if (S.flags.coughing) return;
+  S.flags.coughing = true;
   const conversations = [
     [{ speaker: '—', portrait: 'sibling', text: "You stopped picking up." }],
     [
@@ -1419,18 +1407,18 @@ function talkSibling() {
 }
 
 
-//
-// coughing mold exposure without mask
-// red flash every 4 sec
-// 5 min without mask die
-// cancel get mask kill mold
-//
+        'The Thermophilic Fungal Virus consumed you. You collapsed coughing, far from help, far from morning.\n\nThe alarm clock kept playing static into an empty room.',
+        'bad');
+    }
+  }, 300000);
+}
+
 
 function startCoughing() {
   if (S.flags.coughing) return;
   S.flags.coughing = true;
 
-  // visual pulse red vignette flash
+function finalChoice() {
   S.coughTimer = setInterval(() => {
     if (S.dead || S.won) { clearInterval(S.coughTimer); return; }
     if (S.flags.maskWorn) { clearInterval(S.coughTimer); S.flags.coughing = false; return; }
@@ -1442,20 +1430,22 @@ function startCoughing() {
     }, 500);
   }, 4000);
 
-  // death 5 minutes 300 000ms
+function chooseFlee() {
   setTimeout(() => {
     if (!S.dead && !S.won && S.flags.coughing && !S.flags.maskWorn) {
       die('Death by Virus',
-        'The Thermophilic Fungal Virus consumed you. You collapsed coughing, far from help, far from morning.\n\nThe alarm clock kept playing static into an empty room.',
+        `The Thermophilic Fungal Virus consumed you. You collapsed coughing, far from help, far from morning.
+
+The alarm clock kept playing static into an empty room.`,
         'bad');
     }
   }, 300000);
 }
 
 
-//
-// final choice endings
-//
+      "The spores were in every breath of dawn air. The vehicle passed at sunrise. It didn't stop.",
+      'bad'));
+  }
 
 function finalChoice() {
   if (S.dead || S.won) return;
@@ -1476,7 +1466,13 @@ function chooseFlee() {
       { speaker: 'You', portrait: 'mc', text: "The air is orange with sand and pre-dawn light. The vehicle is at the end of the block." },
       { speaker: 'You', portrait: 'mc', text: "I run." },
     ], () => win('Good End — You Leave',
-      'You ran for the vehicle with the mask on and your journal under your arm. The driver looked surprised.\n\nDawn came up pink and hazy as you drove east.\n\nThree days later: the family reveal. They evacuated in the first wave. They thought you were gone. You thought the same about them.\n\nThe apocalypse had been slow and quiet, the way most things end. You were just the last to leave the room.'));
+      `You ran for the vehicle with the mask on and your journal under your arm. The driver looked surprised.
+
+Dawn came up pink and hazy as you drove east.
+
+Three days later: the family reveal. They evacuated in the first wave. They thought you were gone. You thought the same about them.
+
+The apocalypse had been slow and quiet, the way most things end. You were just the last to leave the room.`));
   } else {
     showDialogue([
       { speaker: 'You', portrait: 'mc', text: "I step outside without the mask. The hot morning air is full of something I can't see." },
@@ -1502,17 +1498,25 @@ function chooseStay() {
         { speaker: 'You', portrait: 'mc', text: "Dawn comes. The storm clears by morning." },
         { speaker: 'You', portrait: 'mc', text: "I'm still here. I don't know what that means yet." },
       ], () => win('Survived — Alone',
-        "You made it to morning. The house held.\n\nThe mold, the mirror, the pale figure — gone with the dark.\n\nYou found out later your family had evacuated in the first wave. They thought you were gone. You thought the same.\n\nThe apocalypse was never the virus. It was all the doors that stayed closed before it arrived."));
+        `You made it to morning. The house held.
+
+The mold, the mirror, the pale figure — gone with the dark.
+
+You found out later your family had evacuated in the first wave. They thought you were gone. You thought the same.
+
+The apocalypse was never the virus. It was all the doors that stayed closed before it arrived.`));
     }
   });
 }
 
 
-// both functions guard against double
-// end screen shown short delay
+</html>
 
 
-// maps ending class strings title
+
+
+
+
 const ENDING_COLOURS = {
   'bad':        '#d44040',
   'bad-fungus': '#c060c0',
